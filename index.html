@@ -1850,7 +1850,28 @@ const geoCache = new Map();
 const allOutlines = new Set();
 const GFX = { outlines: true };
 
-function nameTag() { const o = new THREE.Object3D(); Object.defineProperty(o, 'visible', { get: () => false, set: () => {} }); return o; } // los nombres sobre la cabeza se quitaron
+const TAG_TEX = new Map(), TAG_COL = { enemy: '#ff4455', ally: '#4aa8ff', ghost: '#cfd6e6' };
+function tagTex(name, kind) { // etiqueta con el nombre y el color de equipo (rojo enemigo, azul aliado)
+  const key = name + '|' + kind; let t = TAG_TEX.get(key); if (t) return t;
+  const c = document.createElement('canvas'); c.width = 256; c.height = 64; const g = c.getContext('2d'), col = TAG_COL[kind] || TAG_COL.enemy;
+  g.fillStyle = 'rgba(10,12,20,0.62)'; g.strokeStyle = col; g.lineWidth = 5; g.beginPath(); g.roundRect(4, 6, 248, 52, 16); g.fill(); g.stroke();
+  g.fillStyle = col; g.font = 'bold 30px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(name).slice(0, 14), 128, 33);
+  t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; TAG_TEX.set(key, t); return t;
+}
+function nameTag(name, kind = 'enemy') {
+  const m = new THREE.SpriteMaterial({ map: tagTex(name, kind), transparent: true, depthWrite: false, depthTest: kind !== 'ally', fog: false });
+  const o = new THREE.Sprite(m); o.center.set(0.5, 0); o.position.y = 1.95; o.renderOrder = 20; o.userData.name = name; o.userData.kind = kind; o.scale.set(1.6, 0.4, 1); return o;
+}
+function updateTags() { // color según la relación con el jugador y tamaño constante en pantalla
+  const k2 = 2 * Math.tan(camera.fov * Math.PI / 360) / innerHeight;
+  for (const e of ents) {
+    const t = e.tag; if (!t || e === player || !e.alive || e.vis === false) continue;
+    const kind = player && !isEnemy(player, e) ? 'ally' : 'enemy';
+    if (t.userData.kind !== kind) { t.userData.kind = kind; t.material.map = tagTex(e.name, kind); t.material.depthTest = kind !== 'ally'; t.material.needsUpdate = true; }
+    const d = Math.max(2, e.m.pos.distanceTo(camera.position)), w = clamp(96 * d * k2, 0.6, 6);
+    t.scale.set(w, w * 0.25, 1); t.position.y = 1.95 + w * 0.02;
+  }
+}
 
 const easeIO = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 class Spring { constructor() { this.x = 0; this.v = 0; } step(target, dt, k = 140, c = 13) { this.v += (k * (target - this.x) - c * this.v) * dt; this.x += this.v * dt; return this.x; } }
@@ -2229,10 +2250,10 @@ function skinDecals(sk) {
   };
 }
 // --- armas sci-fi (pack de 20 modelos): sirven como skin de cualquier arma; 4 materiales recoloreables, sombreado plano horneado, sin brillos ---
-const SF = { ready: false, p: null, raw: new Map(), names: ['AR_1','AR_3','AR_4','SMG_1','SMG_2','Sniper_1','Sniper_2','Sniper_3','Pistol_1','Pistol_2','Pistol_3','Crossbow_1','Crossbow_2','Grenade_1','Grenade_2','Grenade_3'] };
+const SF = { ready: false, p: null, raw: new Map(), names: ['AR_1','AR_3','AR_4','SMG_1','SMG_2','Sniper_1','Sniper_2','Sniper_3','Pistol_1','Pistol_2','Pistol_3','Crossbow_1','Crossbow_2'] };
 // variantes por tipo de arma, según su parecido (la granada suelta no se usa: no hay granadas; las ballestas y lanzadores van con las escopetas)
 const WCLASS = { ak: 'rifle', m4: 'rifle', ar: 'rifle', scar: 'rifle', dmr: 'rifle', smg: 'smg', vector: 'smg', dualuzi: 'smg', sniper: 'sniper', shotgun: 'shotgun', sg_auto: 'shotgun', sg_double: 'shotgun', magnum: 'pistol', dualp: 'pistol', revolver: 'pistol' };
-const SF_BY = { rifle: ['AR_1','AR_3','AR_4'], smg: ['SMG_1','SMG_2'], sniper: ['Sniper_1','Sniper_2','Sniper_3'], pistol: ['Pistol_1','Pistol_2','Pistol_3'], shotgun: ['Grenade_1','Grenade_2','Grenade_3','Crossbow_1','Crossbow_2'] };
+const SF_BY = { rifle: ['AR_1','AR_3','AR_4'], smg: ['SMG_1','SMG_2'], sniper: ['Sniper_1','Sniper_2','Sniper_3'], pistol: ['Pistol_1','Pistol_2','Pistol_3'], shotgun: ['Crossbow_1','Crossbow_2'] };
 const SF_CLS_NAME = { rifle: 'fusiles', smg: 'subfusiles', sniper: 'francotirador', pistol: 'pistolas', shotgun: 'escopetas' };
 const SF_CACHE = new Map();
 function sfFor(n, wid) { const key = n + '|' + wid + '|' + (S.sfMain || '') + (S.sfAcc || ''); let g = SF_CACHE.get(key); if (!g) { g = sfGeo(n, wid); SF_CACHE.set(key, g); } return g; }
@@ -3766,7 +3787,7 @@ function modeSetup() {
   if (MODE === 'gungame') for (const e of ents) { e.gg = 0; switchWeapon(e, GG_ORDER[0], true); e.ammo = WEAPONS[e.weapon].mag; }
   if (PK.ghostCh) PK.ghostCh.setVisible(false);
   if (MODE === 'parkour' && !PK.ghostCh && VRM_OK) createVRMCharacter('default', { hair: '#9fe8ff', top: '#3b6fd6', name: 'Fantasma' }).then(ch => {
-    PK.ghostCh = ch; scene.add(ch.root); ch.setVisible(false); const tag = nameTag('Fantasma (récord)'); ch.root.add(tag);
+    PK.ghostCh = ch; scene.add(ch.root); ch.setVisible(false); const tag = nameTag('Fantasma (récord)', 'ghost'); ch.root.add(tag);
     ch.vrm.scene.traverse(o => { if (o.isMesh) for (const mm of [].concat(o.material)) { mm.transparent = true; mm.opacity = 0.45; mm.depthWrite = false; } });
   }).catch(e => console.warn(e));
 }
@@ -4523,13 +4544,12 @@ async function newMatch() {
   const MP = NET.role && NET.mp ? NET.mp : null, humans = MP ? MP.players.filter(q => q.nid !== MP.me) : [], nbB = MP ? Math.max(0, S.bots + 1 - MP.players.length) : nb;
   const list = [];
   list.push(new Ent('Tú', await makeChar(true, 0), false)); list[0].team = 0; list[0].nid = MP ? MP.me : 0;
-  for (const h of humans) { const e = new Ent(h.name, await makeChar(false, h.nid, { ...BOT_TINTS[h.nid % BOT_TINTS.length], top: '#d42c38', line: '#ff2a38', name: 'mp' + (h.nid % BOT_TINTS.length) + '·rojo' }), false); e.net = true; e.nid = h.nid; e.team = -1; list.push(e); }
+  for (const h of humans) { const e = new Ent(h.name, await makeChar(false, h.nid, { ...BOT_TINTS[h.nid % BOT_TINTS.length], top: '#d42c38', line: '#ff2a38', name: 'mp' + (h.nid % BOT_TINTS.length) + '·rojo' }), false); e.net = true; e.nid = h.nid; e.team = -1; e.tag = nameTag(h.name); e.ch.root.add(e.tag); list.push(e); }
   for (let i = 0; i < nbB; i++) {
     let name = MODE === 'practice' ? `Muñeco ${i + 1}` : BOT_TINTS[i % BOT_TINTS.length].name, tint = null, team = -1;
     if (MODE !== 'tdm' && MODE !== 'practice' && MODE !== 'parkour') tint = { ...BOT_TINTS[i % BOT_TINTS.length], top: '#d42c38', line: '#ff2a38', name: BOT_TINTS[i % BOT_TINTS.length].name + '·rojo' }; // enemigos en rojo desde tu punto de vista
-    if (MODE === 'tdm') { team = i < S.allies ? 0 : 1; const k = team === 0 ? i : i - S.allies; name = (team === 0 ? ALLY_NAMES : FOE_NAMES)[k]; tint = { ...BOT_TINTS[(k + team * 3) % BOT_TINTS.length], top: team === 0 ? '#2f5fd0' : '#d42c38', line: team === 0 ? '#2a7bff' : '#ff2a38', name: (team ? 'rojo-' : 'azul-') + k }; }
+    if (MODE === 'tdm') { team = i < S.allies ? 0 : 1; const k = team === 0 ? i : i - S.allies; name = (team === 0 ? ALLY_NAMES : FOE_NAMES)[k]; tint = { ...BOT_TINTS[(k + team * 3) % BOT_TINTS.length], top: team === 0 ? '#3a7dff' : '#d42c38', line: team === 0 ? '#4aa8ff' : '#ff2a38', name: (team ? 'rojo-' : 'azul-') + k }; }
     const e = new Ent(name, await makeChar(false, i, tint), true); e.team = team; e.nid = MP ? MP.players.length + i : list.length;
-    if (MODE === 'tdm') { e.tag.removeFromParent(); e.tag = nameTag(name, TEAM.cols[team], team === 0); e.ch.root.add(e.tag); }
     if (MODE === 'practice') { const D = PRACTICE.dummies[i]; e.ai = new DummyAI(e, D.k, new V3(...D.p)); }
     list.push(e);
   }
@@ -5161,6 +5181,7 @@ function frame(now) {
   if (state === 'ending') { endT -= Math.min(0.25, Math.max(0, raw)); if (endT <= 0) finishMatch(); }
   else if (state === 'menu' && player) { player.m.yaw += dt * 0.12; player.m.pitch = -0.12; for (const e of ents) if (e.isBot && e.alive) { const inp = e.ai.think(dt); inp.fire = false; e.m.update(dt, inp); } }
   computeVis(sdt); for (const e of ents) { if (e.alive) syncChar(e, sdt); updateBlob(e); }
+  updateTags();
   const _t2 = performance.now();
   updateAuras(sdt);
   updateFx(sdt);
