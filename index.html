@@ -148,7 +148,7 @@
   <div id="feed"></div><div id="modebox" class="hidden"></div><div id="banner"></div>
   <div id="tut"></div><div id="style"><div id="styleRank">D</div><div id="styleBar"><div id="styleFill"></div></div><div id="stylePops"></div></div>
   <div id="equip"></div>
-  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms</div>
+  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms <span style="opacity:.55">· v9</span></div>
   <div id="movestate"></div>
   <div id="speedo">0 <small>m/s</small></div>
   <div id="hpbox"><div id="hpbar"><div id="hpfill"></div></div><span id="hpnum">100</span></div>
@@ -173,7 +173,7 @@
     <div class="field" style="margin-bottom:14px"><label>Multijugador · hasta 10 (el resto son bots)</label>
       <div id="mpStatus" style="font-size:13px;opacity:.85;margin:2px 0 8px">Sin sala. Crea una o escribe el código de tu amigo.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="mpName" placeholder="Tu nombre" maxlength="14" style="width:120px;background:#1c2033;color:#e8ecff;border:1px solid #3a4262;border-radius:7px;padding:7px 9px"><button id="mpCreate" class="big alt" style="font-size:13px;padding:7px 14px">Crear sala</button><input id="mpCode" placeholder="CÓDIGO" maxlength="5" style="width:84px;text-transform:uppercase;background:#1c2033;color:#e8ecff;border:1px solid #3a4262;border-radius:7px;padding:7px 9px"><button id="mpJoin" class="big alt" style="font-size:13px;padding:7px 14px">Unirse</button><button id="mpLeave" class="big alt" style="font-size:13px;padding:7px 14px;display:none">Salir de la sala</button></div>
-      <div id="mpList"></div></div>
+      <div id="mpList"></div><div id="mpSkinInfo" style="font-size:12.5px;opacity:.8;margin-top:6px"></div></div>
     <div class="field" style="margin-bottom:14px"><label>Modo de juego</label><div class="seg" id="seg6"></div><div id="modeDesc"></div><div id="oneRow" style="display:none;margin-top:8px"><label style="font-size:13px">Arma para todos <select id="oneSel" style="background:#1c2033;color:#e8ecff;border:1px solid #3a4262;border-radius:7px;padding:5px 8px"></select></label></div></div>
     <div class="grid" style="margin-top:6px">
       <div class="field"><label>Mapa <b id="mapNote"></b></label><div class="seg" id="mapSeg"><button data-v="mall">Centro comercial</button><button data-v="school">Academia</button><button data-v="park">Parque de diversiones</button><button data-v="beach">Casas en la playa</button><button data-v="temple">Catedral gótica</button></div></div>
@@ -230,8 +230,8 @@
       <p class="note">Haz clic en una acción y pulsa la tecla nueva (Esc cancela). Clic izquierdo dispara o da un tajo con la katana; clic derecho apunta.</p>
     </div>
     <div class="tab hidden" data-tab="skin">
-      <div class="field"><label>Skin del jugador</label><div class="seg" id="skinSeg"><button data-v="default">Predeterminada</button><button data-v="custom">Mi modelo .vrm</button></div></div>
-      <div class="btnrow" style="margin-top:12px"><button id="loadVrm" class="big alt" style="font-size:14px;padding:9px 16px">Cargar archivo .vrm…</button><input type="file" id="vrmFile" accept=".vrm,.glb" class="hidden"></div>
+      <div class="field"><label>Skin del jugador</label><div class="seg" id="skinSeg" style="flex-wrap:wrap"></div></div>
+      <div class="btnrow" style="margin-top:12px"><button id="loadVrm" class="big alt" style="font-size:14px;padding:9px 16px">Añadir modelos .vrm…</button><input type="file" id="vrmFile" accept=".vrm,.glb" multiple class="hidden"></div>
       <div id="skinInfo"></div>
       <div id="appSel" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:16px"></div>
       <p class="note">El modelo se queda guardado solo en este navegador. Respeta la licencia de cada modelo: algunos autores no permiten usarlos en contenido violento. Los bots usan la skin predeterminada con colores distintos.</p>
@@ -1868,7 +1868,7 @@ function updateTags() { // color según la relación con el jugador y tamaño co
     const t = e.tag; if (!t || e === player || !e.alive || e.vis === false) continue;
     const kind = player && !isEnemy(player, e) ? 'ally' : 'enemy';
     if (t.userData.kind !== kind) { t.userData.kind = kind; t.material.map = tagTex(e.name, kind); t.material.depthTest = kind !== 'ally'; t.material.needsUpdate = true; }
-    const d = Math.max(2, e.m.pos.distanceTo(camera.position)), w = clamp(96 * d * k2, 0.6, 6);
+    const d = Math.max(2, e.m.pos.distanceTo(camera.position)), w = clamp(80 * d * k2, 0.6, 5);
     t.scale.set(w, w * 0.25, 1); t.position.y = 1.95 + w * 0.02;
   }
 }
@@ -2207,7 +2207,8 @@ function tintVRM(vrm, tint) {
   vrm.scene.traverse(o => {
     if (!o.isMesh) return;
     for (const m of [].concat(o.material)) {
-      if (m.isOutline && tint.line) { if (m.outlineColorFactor) m.outlineColorFactor.set(tint.line); else if (m.color) m.color.set(tint.line); continue; }
+      if (m.isOutline && tint.line) { if (m.outlineColorFactor) m.outlineColorFactor.set(tint.line); else if (m.color) m.color.set(tint.line); if ('outlineWidthMode' in m) { m.outlineWidthMode = 'screenCoordinates'; m.outlineWidthFactor = 0.0085; m.outlineLightingMixFactor = 0; } continue; }
+      if (tint.keep) continue;
       if (!m.color || m.isOutline) continue;
       const n = m.name || '';
       if (/HAIR/i.test(n)) { m.color.set(tint.hair); if (m.shadeColorFactor) m.shadeColorFactor.set(tint.hair).multiplyScalar(0.7); }
@@ -2492,7 +2493,7 @@ class CharacterVRM {
     this.outlineMats = [];
     vrm.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; for (const m of [].concat(o.material)) if (m.isOutline) { this.outlineMats.push(m); allOutlineMats.add(m); m.visible = GFX.outlines; } } });
     this.faceDet = []; vrm.scene.traverse(o => { if (o.isMesh && !Array.isArray(o.material) && !o.material.isOutline && /Eye|Brow|Mouth|Lash/i.test(o.material.name || '')) this.faceDet.push(o); });
-    this.detail = 0;
+    this.detail = 0; this.teamLine = !!(tint && tint.line);
     this.mixer = new THREE.AnimationMixer(vrm.scene);
     this.act = {}; this.w = {};
     for (const [k, clip] of Object.entries(model.lib.clips)) {
@@ -2546,7 +2547,7 @@ class CharacterVRM {
   setDetail(l) { // 0 completo · 1 sin parpadeo · 2 sin detalles de cara · 3 además sin contorno
     if (l === this.detail) return; this.detail = l;
     for (const o of this.faceDet) o.visible = l < 2;
-    for (const m of this.outlineMats) m.visible = GFX.outlines && l < 3;
+    for (const m of this.outlineMats) m.visible = GFX.outlines && (l < 3 || this.teamLine);
   }
   resetPhysics() { try { this.vrm.springBoneManager && this.vrm.springBoneManager.reset(); } catch (e) {} }
   setVisible(v) { this.root.visible = v; this.gun.visible = v; if (!v) this.gun2.visible = false; }
@@ -4513,11 +4514,11 @@ function updateHUD(dt) {
 // ======================= Partida =======================
 const BOT_NAMES = ['Rin', 'Sora', 'Aka', 'Yuki', 'Hana', 'Ren', 'Mio'];
 let VRM_OK = false;
-async function makeChar(isPlayer, i, tint) {
+async function makeChar(isPlayer, i, tint, mid) {
   if (VRM_OK) {
     try {
-      if (isPlayer) return await createVRMCharacter(S.skin === 'custom' && MODELS.custom ? 'custom' : 'default', null);
-      return await createVRMCharacter('default', tint || BOT_TINTS[i % BOT_TINTS.length]);
+      if (isPlayer) return await createVRMCharacter(MODELS[skinModelId()] ? skinModelId() : 'default', null);
+      return await createVRMCharacter(mid || 'default', tint || BOT_TINTS[i % BOT_TINTS.length]);
     } catch (e) { console.warn(e); }
   }
   return new Character(isPlayer ? 0 : 1 + (i % 7));
@@ -4544,7 +4545,13 @@ async function newMatch() {
   const MP = NET.role && NET.mp ? NET.mp : null, humans = MP ? MP.players.filter(q => q.nid !== MP.me) : [], nbB = MP ? Math.max(0, S.bots + 1 - MP.players.length) : nb;
   const list = [];
   list.push(new Ent('Tú', await makeChar(true, 0), false)); list[0].team = 0; list[0].nid = MP ? MP.me : 0;
-  for (const h of humans) { const e = new Ent(h.name, await makeChar(false, h.nid, { ...BOT_TINTS[h.nid % BOT_TINTS.length], top: '#d42c38', line: '#ff2a38', name: 'mp' + (h.nid % BOT_TINTS.length) + '·rojo' }), false); e.net = true; e.nid = h.nid; e.team = -1; e.tag = nameTag(h.name); e.ch.root.add(e.tag); list.push(e); }
+  if (MP) { await netWaitSkins(); const want = new Set(humans.map(h => NET.skins[h.nid] && NET.skins[h.nid].done ? 'r' + h.nid + '_' + NET.skins[h.nid].bytes : '')); for (const k of Object.keys(MODELS)) if (k[0] === 'r' && !want.has(k)) disposeModel(k); }
+  for (const h of humans) {
+    let mid = 'default', tH = { ...BOT_TINTS[h.nid % BOT_TINTS.length], top: '#d42c38', line: '#ff2a38', name: 'mp' + (h.nid % BOT_TINTS.length) + '·rojo' };
+    const sk = NET.skins[h.nid];
+    if (sk && sk.done) { const id = 'r' + h.nid + '_' + sk.bytes; try { if (!MODELS[id]) await registerModel(id, await netSkinBytes(sk)); mid = id; tH = { name: 'keep' + h.nid, hair: '#28355f', top: '#d42c38', line: '#ff2a38', keep: true }; } catch (er) { console.warn('skin remota', er); } }
+    const e = new Ent(h.name, await makeChar(false, h.nid, tH, mid), false); e.net = true; e.nid = h.nid; e.team = -1; e.tag = nameTag(h.name); e.ch.root.add(e.tag); list.push(e);
+  }
   for (let i = 0; i < nbB; i++) {
     let name = MODE === 'practice' ? `Muñeco ${i + 1}` : BOT_TINTS[i % BOT_TINTS.length].name, tint = null, team = -1;
     if (MODE !== 'tdm' && MODE !== 'practice' && MODE !== 'parkour') tint = { ...BOT_TINTS[i % BOT_TINTS.length], top: '#d42c38', line: '#ff2a38', name: BOT_TINTS[i % BOT_TINTS.length].name + '·rojo' }; // enemigos en rojo desde tu punto de vista
@@ -4608,9 +4615,39 @@ function finishMatch() {
 
 let wallAcc = 0;
 // Movimiento Mixto: recorrido (Warframe) por defecto; marcha de pelea (GunZ) con enemigos cerca, al disparar o al recibir daño, con 2,5 s de margen
+// ---- compartir skins en línea: se reduce el .vrm (texturas ≤768 px en JPEG), se comprime y se manda en trozos ----
+const b64enc = u8 => { let t = ''; for (let i = 0; i < u8.length; i += 0x8000) t += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(t); };
+const b64dec = str => { const bin = atob(str), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
+const gzip = async u8 => new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+const gunzip = async u8 => await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+async function slimVRM(buf, cap = 768) {
+  const dv = new DataView(buf); if (dv.getUint32(0, true) !== 0x46546C67) throw new Error('no es un archivo glb/vrm');
+  let off = 12, js = null, bin = null;
+  while (off < buf.byteLength) { const cl = dv.getUint32(off, true), ct = dv.getUint32(off + 4, true); const c = buf.slice(off + 8, off + 8 + cl); off += 8 + cl;
+    if (ct === 0x4E4F534A) js = JSON.parse(new TextDecoder().decode(c)); else if (ct === 0x004E4942) bin = new Uint8Array(c); }
+  const bv = js.bufferViews, repl = new Map(), cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently: true });
+  for (const im of (js.images || [])) {
+    if (im.bufferView === undefined) continue; const v = bv[im.bufferView], o0 = v.byteOffset || 0, raw = bin.subarray(o0, o0 + v.byteLength);
+    try {
+      const bmp = await createImageBitmap(new Blob([raw], { type: im.mimeType || 'image/png' })), sc = Math.min(1, cap / Math.max(bmp.width, bmp.height));
+      const w = Math.max(4, Math.round(bmp.width * sc)), h = Math.max(4, Math.round(bmp.height * sc)); cv.width = w; cv.height = h; cx.clearRect(0, 0, w, h); cx.drawImage(bmp, 0, 0, w, h); if (bmp.close) bmp.close();
+      const d = cx.getImageData(0, 0, w, h).data; let alpha = false; for (let i = 3; i < d.length; i += 4) if (d[i] < 250) { alpha = true; break; }
+      const blob = await new Promise(r => cv.toBlob(r, alpha ? 'image/png' : 'image/jpeg', 0.82)), data = new Uint8Array(await blob.arrayBuffer());
+      if (sc < 1 || data.length < raw.length) { repl.set(im.bufferView, data); im.mimeType = alpha ? 'image/png' : 'image/jpeg'; }
+    } catch (e) { console.warn('slim img', e); }
+  }
+  const parts = []; let len = 0;
+  for (let i = 0; i < bv.length; i++) { const v = bv[i], o0 = v.byteOffset || 0, data = repl.get(i) || bin.subarray(o0, o0 + v.byteLength); const pad = (4 - len % 4) % 4; if (pad) { parts.push(new Uint8Array(pad)); len += pad; } v.byteOffset = len; v.byteLength = data.length; parts.push(data); len += data.length; }
+  js.buffers[0].byteLength = len;
+  let j = new TextEncoder().encode(JSON.stringify(js)); const jp = (4 - j.length % 4) % 4, bp = (4 - len % 4) % 4, total = 12 + 8 + j.length + jp + 8 + len + bp, out = new Uint8Array(total), od = new DataView(out.buffer);
+  od.setUint32(0, 0x46546C67, true); od.setUint32(4, 2, true); od.setUint32(8, total, true); od.setUint32(12, j.length + jp, true); od.setUint32(16, 0x4E4F534A, true); out.set(j, 20); for (let i = 0; i < jp; i++) out[20 + j.length + i] = 32;
+  let p = 20 + j.length + jp; od.setUint32(p, len + bp, true); od.setUint32(p + 4, 0x004E4942, true); p += 8; for (const q of parts) { out.set(q, p); p += q.length; }
+  return out.buffer;
+}
+const skinShareable = mid => { const M = MODELS[mid]; if (!M) return false; const m = M.template.meta || {}; return M.v0 ? m.allowedUserName === 'Everyone' : m.allowRedistribution === true; };
 // ======================= Multijugador (WebRTC con PeerJS) =======================
 // El anfitrión simula bots, daño, bajas y puntuación; cada jugador mueve su propio personaje y manda su estado ~20 veces por segundo.
-const NET = { role: null, peer: null, conns: [], hc: null, code: '', me: 0, players: [], mp: null, acc: 0, ready: new Set(), bus: null, applyKill: false, allowEnd: false };
+const NET = { role: null, peer: null, conns: [], hc: null, code: '', me: 0, players: [], mp: null, acc: 0, ready: new Set(), bus: null, applyKill: false, allowEnd: false, skins: {}, mine: null, mineMsg: '' };
 const NET_WALL = { n: { x: 0, z: 0 } }, NET_FLIP = ['front', 'back', 'side', 'wj'];
 const entByNid = n => ents.find(e => e.nid === n);
 const netBackend = () => location.search.includes('mp=bc') ? 'bc' : 'peer';
@@ -4624,6 +4661,7 @@ function netUI() {
   L.innerHTML = NET.players.map(p => `<span style="display:inline-block;margin:3px 6px 0 0;padding:2px 9px;border-radius:99px;background:rgba(120,160,255,.18);font-size:12.5px">${p.nid === NET.me ? '★ ' : ''}${String(p.name).replace(/[<>&]/g, '')}</span>`).join('');
   document.getElementById('mpCreate').style.display = NET.role ? 'none' : ''; document.getElementById('mpJoin').style.display = NET.role ? 'none' : ''; document.getElementById('mpCode').style.display = NET.role ? 'none' : '';
   document.getElementById('mpLeave').style.display = NET.role ? '' : 'none';
+  { const el = document.getElementById('mpSkinInfo'); if (el) el.textContent = NET.role ? NET.mineMsg : ''; }
   if (host) netStatus(`Sala ${NET.code} · ${NET.players.length}/10 · pásales el código y pulsa JUGAR para empezar (el resto son bots)`);
   else if (cl) netStatus(`Conectado a la sala ${NET.code} · ${NET.players.length} jugadores · espera a que el anfitrión pulse JUGAR`);
   else netStatus('Sin sala. Crea una o escribe el código de tu amigo.');
@@ -4633,7 +4671,7 @@ function netLoadPeerJS() { return window.Peer ? Promise.resolve() : new Promise(
 function netLeave(msg) {
   for (const c of NET.conns) try { c.close(); } catch (e) {} if (NET.hc) try { NET.hc.close(); } catch (e) {}
   if (NET.peer) try { NET.peer.destroy(); } catch (e) {} if (NET.bus) try { NET.bus.close(); } catch (e) {}
-  NET.role = null; NET.peer = null; NET.conns = []; NET.hc = null; NET.players = []; NET.mp = null; NET.bus = null; NET.me = 0; NET.code = ''; NET.ready.clear();
+  NET.role = null; NET.peer = null; NET.conns = []; NET.hc = null; NET.players = []; NET.mp = null; NET.bus = null; NET.me = 0; NET.code = ''; NET.ready.clear(); NET.skins = {}; NET.mine = null; NET.mineMsg = '';
   netUI(); if (msg) netStatus(msg);
 }
 function netName() { return (document.getElementById('mpName').value || 'Jugador').trim().slice(0, 14) || 'Jugador'; }
@@ -4652,7 +4690,7 @@ async function netHost() {
       peer.on('connection', conn => { conn.on('open', () => netOnConn(conn)); conn.on('data', d => netOnData(conn, d)); conn.on('close', () => netOnClose(conn)); conn.on('error', () => netOnClose(conn)); });
     }).catch(e => { netLeave('No se pudo crear la sala (' + (e && e.type || e) + '). Inténtalo otra vez.'); throw e; });
   }
-  netUI();
+  netUI(); netShareSkin();
 }
 async function netJoin(code) {
   code = String(code || '').trim().toUpperCase(); if (!code) { netStatus('Escribe el código de la sala.'); return; }
@@ -4674,7 +4712,7 @@ async function netJoin(code) {
 function netOnConn(c) { if (!NET.conns.includes(c)) NET.conns.push(c); }
 function netOnClose(c) {
   if (NET.role === 'host') {
-    NET.conns = NET.conns.filter(x => x !== c); const pl = NET.players.find(p => p.nid === c.nid); NET.players = NET.players.filter(p => p.nid !== c.nid);
+    NET.conns = NET.conns.filter(x => x !== c); delete NET.skins[c.nid]; const pl = NET.players.find(p => p.nid === c.nid); NET.players = NET.players.filter(p => p.nid !== c.nid);
     const e = entByNid(c.nid); if (e && e.net) { e.net = false; e.isBot = true; e.ai = new BotAI(e); e.ai.reset(); e.nt = null; if (typeof addFeed === 'function' && pl) banner(pl.name + ' salió', 'ahora lo juega un bot', 1.6); }
     netBroadcast({ t: 'lobby', p: NET.players }); netUI();
   } else if (NET.role === 'client' && c === NET.hc) {
@@ -4692,8 +4730,10 @@ function netOnData(c, d) {
         if (NET.players.length >= 10) { netSend(c, { t: 'busy' }); break; }
         let nid = 1; while (NET.players.some(p => p.nid === nid)) nid++;
         c.nid = nid; NET.players.push({ nid, name: String(d.n || 'Jugador').slice(0, 14) });
-        netSend(c, { t: 'welcome', nid, p: NET.players }); netBroadcast({ t: 'lobby', p: NET.players }, c); netUI(); break; }
+        netSend(c, { t: 'welcome', nid, p: NET.players }); netBroadcast({ t: 'lobby', p: NET.players }, c); netUI();
+        (async () => { for (const [k, r] of Object.entries(NET.skins)) if (r && r.done && +k !== nid) await netPushSkin(c, +k, r); })(); break; }
       case 'ready': NET.ready.add(c.nid); break;
+      case 'skin': case 'skc': if (c.nid === undefined) break; d.nid = c.nid; netSkinIn(c, d); netBroadcast(d, c); break;
       case 'st': if (e && e.net && !(e.nfIgnore > tAll)) e.nt = d.f; break;
       case 'hit': { const t = entByNid(d.v); if (e && t && e.alive && t.alive) damage(t, e, clamp(+d.d || 0, 0, 200), !!d.h, new V3(d.at[0], d.at[1], d.at[2]), !!d.w, d.c); break; }
       case 'fx': netFx(d); netBroadcast(d, c); break;
@@ -4701,7 +4741,8 @@ function netOnData(c, d) {
     }
   } else {
     switch (d.t) {
-      case 'welcome': NET.me = d.nid; NET.players = d.p; netUI(); break;
+      case 'welcome': NET.me = d.nid; NET.players = d.p; netUI(); netShareSkin(); break;
+      case 'skin': case 'skc': netSkinIn(null, d); break;
       case 'lobby': NET.players = d.p; netUI(); break;
       case 'busy': netLeave('La sala está llena o la partida ya empezó.'); break;
       case 'start': netClientStart(d.cfg); break;
@@ -4727,6 +4768,39 @@ async function netHostStart() {
   const t0 = performance.now(); while (NET.ready.size < NET.conns.length && performance.now() - t0 < 25000) await sleep(100);
   const r2 = v => Math.round(v * 100) / 100;
   netBroadcast({ t: 'go', p: ents.map(e => [e.nid, r2(e.m.pos.x), r2(e.m.pos.y), r2(e.m.pos.z), r2(e.m.yaw)]) });
+}
+
+// ---- skins en línea: cada jugador manda su skin (si su licencia lo permite) al anfitrión y este la reparte ----
+const SKCH = 24000;
+async function netSkinPrep() { // prepara mi skin (reducida y comprimida) para compartirla
+  NET.mine = null; NET.mineMsg = '';
+  if (S.skin === 'default') return;
+  const mid = skinModelId(); if (!MODELS[mid] && !(await ensureSkin(S.skin))) return;
+  if (!skinShareable(mid)) { NET.mineMsg = 'La licencia de tu skin no permite compartirla: los demás te verán con la skin predeterminada.'; return; }
+  NET.mineMsg = 'Preparando tu skin para compartirla…'; netUI();
+  try { const gz = await gzip(new Uint8Array(await slimVRM(MODELS[mid].buffer))); const ch = []; for (let i = 0; i < gz.length; i += SKCH * 3 / 4) ch.push(b64enc(gz.subarray(i, i + SKCH * 3 / 4))); NET.mine = { name: String((MODELS[mid].template.meta || {}).name || (MODELS[mid].template.meta || {}).title || 'skin').slice(0, 30), ch, bytes: gz.length }; NET.mineMsg = `Tu skin se comparte con la sala (${(gz.length / 1e6).toFixed(1)} MB).`; }
+  catch (e) { console.warn('skin prep', e); NET.mineMsg = 'No se pudo preparar tu skin; te verán con la predeterminada.'; }
+}
+async function netPushSkin(conn, nid, rec) { // envía una skin (o su ausencia) a una conexión, en trozos
+  if (!rec || !rec.ch) { netSend(conn, { t: 'skin', nid, n: 0 }); return; }
+  netSend(conn, { t: 'skin', nid, n: rec.ch.length, name: rec.name, bytes: rec.bytes });
+  for (let i = 0; i < rec.ch.length; i++) { netSend(conn, { t: 'skc', nid, i, d: rec.ch[i] }); if (i % 12 === 11) await sleep(8); }
+}
+async function netShareSkin() { // llamado al entrar a la sala o al cambiar de skin
+  if (!NET.role) return; const nid = NET.me;
+  if (S.skin !== 'default') { if (NET.role === 'host') { NET.skins[0] = { pending: true, done: false, n: 0, cnt: 0, ch: [] }; netBroadcast({ t: 'skin', nid: 0, n: -1 }); } else netSend(NET.hc, { t: 'skin', nid, n: -1 }); }
+  await netSkinPrep(); netUI();
+  if (NET.role === 'host') { NET.skins[0] = NET.mine ? { name: NET.mine.name, n: NET.mine.ch.length, cnt: NET.mine.ch.length, ch: NET.mine.ch, done: true, bytes: NET.mine.bytes } : null; for (const c of NET.conns) netPushSkin(c, 0, NET.mine); }
+  else netPushSkin(NET.hc, nid, NET.mine);
+}
+function netSkinIn(from, d) { // trozos de skins recibidos (cliente o anfitrión)
+  if (d.t === 'skin') { NET.skins[d.nid] = d.n < 0 ? { pending: true, done: false, n: 0, cnt: 0, ch: [] } : d.n ? { name: d.name, n: d.n, cnt: 0, ch: new Array(d.n), done: false, bytes: d.bytes } : null; }
+  else { const r = NET.skins[d.nid]; if (!r || r.ch[d.i] !== undefined) return; r.ch[d.i] = d.d; if (++r.cnt >= r.n) r.done = true; }
+}
+async function netSkinBytes(rec) { const parts = rec.ch.map(b64dec); let n = 0; for (const q of parts) n += q.length; const u = new Uint8Array(n); let o = 0; for (const q of parts) { u.set(q, o); o += q.length; } return await gunzip(u); }
+async function netWaitSkins() { // antes de empezar: espera a que lleguen las skins de los demás (máx. 90 s)
+  const t0 = performance.now(); const need = () => Object.entries(NET.skins).filter(([nid, r]) => +nid !== NET.me && r && !r.done);
+  while (need().length && performance.now() - t0 < 90000) { loadEl.textContent = 'Recibiendo skins de tus amigos…'; await sleep(200); }
 }
 const NF_R = v => Math.round(v * 100) / 100;
 function netFrame(e) { // estado compacto de un personaje: posición, orientación, movimiento y lo necesario para animarlo
@@ -4962,28 +5036,64 @@ function licenseInfo(model) {
   const ok = /allow/i.test(viol || '') && !/disallow/i.test(viol || '');
   return `<b>${title}</b> · autor: ${author}<br>Uso violento: <b class="${ok ? '' : 'warn'}">${ok ? 'permitido' : 'NO permitido por su autor'}</b> · Quién puede usarlo: ${who || 'no indicado'}`;
 }
+// biblioteca de skins del jugador: cada modelo .vrm se optimiza al cargarlo y queda guardado en este navegador
+let SKINLIB = [];
+const skinModelId = (k = S.skin) => k === 'default' ? 'default' : 'u' + String(k).slice(2);
+async function libInit() {
+  SKINLIB = (await idbGet('vrmIdx')) || [];
+  if (!SKINLIB.length) { const old = await idbGet('customVrm'); if (old) { SKINLIB = [{ id: 'legacy', name: 'Mi modelo' }]; await idbSet('vrm:legacy', old); await idbSet('vrmIdx', SKINLIB); } }
+  if (S.skin === 'custom') S.skin = SKINLIB.length ? 'u:' + SKINLIB[0].id : 'default';
+  if (S.skin !== 'default' && !SKINLIB.some(x => 'u:' + x.id === S.skin)) S.skin = 'default';
+}
+async function ensureSkin(k) {
+  if (k === 'default') return true; const mid = skinModelId(k); if (MODELS[mid]) return true;
+  const buf = await idbGet('vrm:' + String(k).slice(2)); if (!buf) return false;
+  try { await registerModel(mid, buf); return true; } catch (e) { console.warn(e); return false; }
+}
+function renderSkinSeg() {
+  const seg = $('skinSeg'); if (!seg) return;
+  seg.innerHTML = '<button data-v="default">Predeterminada</button>' + SKINLIB.map(x => `<button data-v="u:${x.id}" style="display:inline-flex;align-items:center;gap:7px">${x.thumb ? `<img src="${x.thumb}" style="width:30px;height:30px;border-radius:6px;object-fit:cover">` : ''}${String(x.name).replace(/[<>&]/g, '')}<span data-del="${x.id}" title="Quitar" style="opacity:.6;padding:0 3px">✕</span></button>`).join('');
+  seg.querySelectorAll('button').forEach(bt => bt.onclick = async ev => {
+    const del = ev.target.dataset && ev.target.dataset.del;
+    if (del) { ev.stopPropagation(); await libRemove(del); return; }
+    const k = bt.dataset.v; if (k === S.skin) return; $('skinInfo').textContent = 'Cargando skin…';
+    if (!(await ensureSkin(k))) { $('skinInfo').innerHTML = '<span class="warn">No se pudo cargar esa skin.</span>'; return; }
+    S.skin = k; saveS(); refreshSkinUI(); await swapPlayerSkin(); netShareSkin();
+  });
+}
+async function libRemove(id) {
+  const k = 'u:' + id; SKINLIB = SKINLIB.filter(x => x.id !== id); await idbSet('vrmIdx', SKINLIB); await idbSet('vrm:' + id, null);
+  if (MODELS[skinModelId(k)]) { const wasSel = S.skin === k; if (wasSel) { S.skin = 'default'; saveS(); await swapPlayerSkin(); } disposeModel(skinModelId(k)); }
+  renderSkinSeg(); refreshSkinUI();
+}
 function refreshSkinUI() {
-  document.querySelectorAll('#skinSeg button').forEach(b => { b.classList.toggle('on', b.dataset.v === S.skin); b.disabled = b.dataset.v === 'custom' && !MODELS.custom; });
+  renderSkinSeg();
+  document.querySelectorAll('#skinSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.skin));
   const info = $('skinInfo'); if (!info) return;
   if (!VRM_OK) { info.innerHTML = 'El personaje animado no se pudo cargar; se usa el personaje básico.'; return; }
-  const m = S.skin === 'custom' && MODELS.custom ? MODELS.custom : MODELS.default;
+  const own = S.skin !== 'default', m = (own && MODELS[skinModelId()]) || MODELS.default;
   const O = m.template.userData && m.template.userData.opt, mp = v => (v / 1e6).toFixed(1) + ' Mpx';
-  info.innerHTML = (S.skin === 'custom' ? 'Usando tu modelo: ' : 'Skin predeterminada: ') + licenseInfo(m) + (O && S.skin === 'custom' ? `<br><span style="opacity:.8">Optimizado automáticamente y guardado para tus próximas partidas · polígonos ${O.tris0.toLocaleString()} → ${O.tris1.toLocaleString()} · texturas ${mp(O.px0)} → ${mp(O.px1)}</span>` : '');
+  info.innerHTML = (own ? 'Usando tu modelo: ' : 'Skin predeterminada: ') + licenseInfo(m) + (O && own ? `<br><span style="opacity:.8">Optimizado automáticamente y guardado en este navegador · polígonos ${O.tris0.toLocaleString()} → ${O.tris1.toLocaleString()} · texturas ${mp(O.px0)} → ${mp(O.px1)}</span>` : '') + (own ? '<br><span style="opacity:.8">Solo tú ves tu skin; los demás jugadores te ven con la predeterminada.</span>' : '');
 }
 async function swapPlayerSkin() {
   if (!player || !VRM_OK) return;
   const ch = await makeChar(true, 0); const old = player.ch;
   player.ch = ch; scene.add(ch.root); ch.setVisible(player.alive); old.dispose();
 }
-async function loadCustomVrm(file) {
-  const info = $('skinInfo'); info.textContent = 'Cargando ' + file.name + '…';
-  try {
-    const buf = await file.arrayBuffer();
-    if (MODELS.custom) disposeModel('custom');
-    await registerModel('custom', buf);
-    S.skin = 'custom'; saveS(); idbSet('customVrm', buf);
-    await swapPlayerSkin(); refreshSkinUI();
-  } catch (e) { console.warn(e); info.innerHTML = '<span class="warn">No se pudo cargar ese archivo: ' + (e.message || e) + '</span>'; }
+async function loadCustomVrms(files) {
+  const info = $('skinInfo'); let last = null;
+  for (const file of files) {
+    info.textContent = 'Cargando ' + file.name + '…';
+    try {
+      const buf = await file.arrayBuffer(), id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5), mid = 'u' + id;
+      await registerModel(mid, buf);
+      let thumb = null; try { const t = MODELS[mid].template.meta && MODELS[mid].template.meta.thumbnailImage; if (t) { const c = document.createElement('canvas'); c.width = c.height = 64; c.getContext('2d').drawImage(t, 0, 0, 64, 64); thumb = c.toDataURL('image/jpeg', 0.75); } } catch (e) {}
+      const nm = file.name.replace(/\.(vrm|glb)$/i, '').slice(0, 24);
+      SKINLIB.push({ id, name: nm, thumb }); await idbSet('vrm:' + id, buf); await idbSet('vrmIdx', SKINLIB); last = 'u:' + id;
+    } catch (e) { console.warn(e); info.innerHTML = '<span class="warn">No se pudo cargar ' + file.name + ': ' + (e.message || e) + '</span>'; await sleep(1800); }
+  }
+  if (last) { S.skin = last; saveS(); await swapPlayerSkin(); netShareSkin(); }
+  refreshSkinUI();
 }
 
 function bindMenu() {
@@ -5107,8 +5217,7 @@ function bindMenu() {
   updXH();
   // skin
   $('loadVrm').onclick = () => $('vrmFile').click();
-  $('vrmFile').onchange = e => { const f = e.target.files[0]; if (f) loadCustomVrm(f); e.target.value = ''; };
-  document.querySelectorAll('#skinSeg button').forEach(b => b.onclick = async () => { if (b.dataset.v === S.skin) return; S.skin = b.dataset.v; saveS(); refreshSkinUI(); await swapPlayerSkin(); });
+  $('vrmFile').onchange = e => { const f = [...e.target.files]; if (f.length) loadCustomVrms(f); e.target.value = ''; };
   upd();
 }
 function keyName(c) { return !c ? '—' : c.replace(/^Key/, '').replace(/^Digit/, '').replace('ShiftLeft', 'Shift izq.').replace('ShiftRight', 'Shift der.').replace('ControlLeft', 'Ctrl').replace('AltLeft', 'Alt').replace('Space', 'Espacio').replace('CapsLock', 'Bloq Mayús').replace('Backquote', 'º'); }
@@ -5136,10 +5245,7 @@ async function init() {
     const res = await fetch('model.json'); if (!res.ok) throw new Error('model.json ' + res.status);
     await registerModel('default', await unpackB64((await res.json()).model));
     VRM_OK = true;
-    if (S.skin === 'custom') {
-      const b = await idbGet('customVrm');
-      if (b) { try { await registerModel('custom', b); } catch (e) { console.warn(e); S.skin = 'default'; } } else S.skin = 'default';
-    }
+    await libInit(); if (!(await ensureSkin(S.skin))) S.skin = 'default';
   } catch (e) {
     console.warn(e); loadEl.textContent = 'No se pudo cargar el personaje animado. Se usará el personaje básico.'; await sleep(1500);
   }
