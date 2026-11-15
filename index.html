@@ -148,7 +148,7 @@
   <div id="feed"></div><div id="modebox" class="hidden"></div><div id="banner"></div>
   <div id="tut"></div><div id="style"><div id="styleRank">D</div><div id="styleBar"><div id="styleFill"></div></div><div id="stylePops"></div></div>
   <div id="equip"></div>
-  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms <span style="opacity:.55">· v12</span></div>
+  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms <span style="opacity:.55">· v13</span></div>
   <div id="movestate"></div>
   <div id="speedo">0 <small>m/s</small></div>
   <div id="hpbox"><div id="hpbar"><div id="hpfill"></div></div><span id="hpnum">100</span></div>
@@ -3757,11 +3757,11 @@ function squadCheck() {
 const ZB = { boss: 0, wave: 0, st: 'prep', t: 0, over: false, bossE: null, left: 0, drip: 0, hum: 1, revT: -1, net: 0 };
 const ZB_N = 4;
 const ZK = {
-  lamedor:  { name: 'Lamedor', hp: 70, speed: 9.4, reach: 1.9, wind: 0.32, dmg: 13, cd: 0.7, scale: 0.95, lean: 0.55, fov: 1 },
-  espinoso: { name: 'Espinoso', hp: 150, speed: 6.4, reach: 2.2, wind: 0.5, dmg: 20, cd: 0.9, scale: 1.08, lean: 0.12 },
-  gigante1: { name: 'Gigante rojo', hp: 1300, speed: 6.2, reach: 3.5, wind: 0.85, dmg: 42, cd: 1.5, scale: 1.7, lean: 0.1, aoe: 3.8, boss: true },
-  gigante2: { name: 'Gigante verde', hp: 1100, speed: 7.0, reach: 3.0, wind: 0.65, dmg: 34, cd: 1.2, scale: 1.55, lean: 0.14, charge: true, boss: true },
-  ejecutor: { name: 'Ejecutor', hp: 1000, speed: 8.0, reach: 2.8, wind: 0.5, dmg: 30, cd: 1.0, scale: 1.45, lean: 0.2, tail: 8.5, boss: true },
+  lamedor:  { name: 'Lamedor', hp: 70, speed: 12, reach: 2.1, wind: 0.22, dmg: 15, cd: 0.45, scale: 0.95, lean: 0.55, fov: 1 },
+  espinoso: { name: 'Espinoso', hp: 150, speed: 8.6, reach: 2.4, wind: 0.34, dmg: 22, cd: 0.6, scale: 1.08, lean: 0.12 },
+  gigante1: { name: 'Gigante rojo', hp: 1300, speed: 8.4, reach: 3.7, wind: 0.6, dmg: 42, cd: 1.0, scale: 1.7, lean: 0.1, aoe: 3.8, boss: true },
+  gigante2: { name: 'Gigante verde', hp: 1100, speed: 9.2, reach: 3.2, wind: 0.45, dmg: 34, cd: 0.8, scale: 1.55, lean: 0.14, charge: true, boss: true },
+  ejecutor: { name: 'Ejecutor', hp: 1000, speed: 10.4, reach: 3.0, wind: 0.35, dmg: 30, cd: 0.7, scale: 1.45, lean: 0.2, tail: 8.5, boss: true },
 };
 const ZBOSS = ['gigante1', 'gigante2', 'ejecutor'];
 const ZMAT = new THREE.MeshBasicMaterial({ vertexColors: true });
@@ -3857,7 +3857,7 @@ class ZombieChar {
 }
 const zParams = k => { const P = styleParams('kaze'); P.WALK = ZK[k].speed; P.MAXH = ZK[k].speed * 1.5; P.JUMP = 9.2; P.DJUMP = 0; return P; };
 class ZombieAI {
-  constructor(e, kind) { this.e = e; this.kind = kind; this.nav = new BotAI(e); this.T = null; this.tT = 0; this.cd = 0.5; this.wind = 0; this.stuckT = 0; this.stuckP = new V3(); this.chT = 4 + Math.random() * 4; this.charge = 0; this.hit = false; this.useTail = false; this.vis = false; }
+  constructor(e, kind) { this.e = e; this.kind = kind; this.nav = new BotAI(e); this.T = null; this.tT = 0; this.cd = 0.5; this.wind = 0; this.stuckT = 0; this.stuckP = new V3(); this.chT = 2 + Math.random() * 3; this.dashT = 1; this.charge = 0; this.hit = false; this.useTail = false; this.vis = false; }
   reset() { this.T = null; this.tT = 0; this.cd = 0.6; this.wind = 0; this.charge = 0; this.nav.path = null; this.e.zAtkP = -1; }
   strike(T, Z, reach) {
     const e = this.e, m = e.m; _zd.set(T.m.pos.x - m.pos.x, 0, T.m.pos.z - m.pos.z); const d = _zd.length(); if (d > reach + 0.9 || Math.abs(T.m.pos.y - m.pos.y) > 2.6) return;
@@ -3884,6 +3884,7 @@ class ZombieAI {
     }
     const eyeOk = () => { _zc.set(m.pos.x, m.pos.y + 1.3, m.pos.z); _zt.set(T.m.pos.x, T.m.pos.y + 1.2, T.m.pos.z); return los(_zc, _zt); };
     this.chT -= dt; const sees = dist < 40 && eyeOk(); this.vis = sees;
+    this.dashT -= dt; if (!Z.boss && this.dashT <= 0 && sees && dist > 5 && dist < 16 && m.grounded) { this.dashT = 2 + Math.random() * 2; inp.dash = true; }
     if (Z.charge && this.chT <= 0 && sees && dist > 9 && dist < 28 && m.grounded) { this.chT = 7 + Math.random() * 3; this.charge = 0.9; this.hit = false; beep(60, 0.4, 'sawtooth', 0.22, 0, 35); return inp; }
     if (Z.tail && this.cd <= 0 && sees && dist > Z.reach + 0.6 && dist < Z.tail) { this.wind = Z.wind * 1.4; this.useTail = true; e.zTail = true; this.cd = 99; return inp; }
     if (dist < Z.reach && Math.abs(dy) < 2.2) { face(10); if (this.cd <= 0) { this.wind = Z.wind; this.useTail = false; } return inp; }
@@ -3899,7 +3900,7 @@ class ZombieAI {
   }
 }
 const _zd = new V3(), _zc = new V3(), _zt = new V3();
-function zombieSetup() { ZB.wave = 0; ZB.st = 'prep'; ZB.t = 7; ZB.over = false; ZB.bossE = null; ZB.left = 0; ZB.drip = 0; ZB.revT = -1; ZB.net = 0; ZB.hum = Math.max(1, ents.filter(e => !e.zk && !e.isBot).length); banner('Zombies', 'La primera oleada llega en 7 s', 2.4); }
+function zombieSetup() { ZB.wave = 0; ZB.st = 'prep'; ZB.t = 5; ZB.over = false; ZB.bossE = null; ZB.left = 0; ZB.drip = 0; ZB.revT = -1; ZB.net = 0; ZB.hum = Math.max(1, ents.filter(e => !e.zk && !e.isBot).length); banner('Zombies', 'La primera oleada llega en 7 s', 2.4); }
 function zombieActivate(e) {
   const Z = ZK[e.zk], hm = 1 + 0.4 * (ZB.hum - 1);
   e.hp = Z.boss ? Z.hp * hm : Z.hp * (1 + 0.12 * Math.max(0, ZB.wave - 1)); e.hpMax = e.hp; e.alive = true; e.prot = 0.4; e.firstSpawn = false;
@@ -3921,9 +3922,9 @@ function zombieUpdate(dt) {
   ZB.net -= dt; if (ZB.net <= 0) { ZB.net = 1; zombieNet(); }
   if (ZB.st === 'prep') { ZB.t -= dt; if (ZB.t <= 0) zombieWaveStart(); }
   else if (ZB.st === 'wave' || ZB.st === 'boss') {
-    ZB.drip -= dt; const cap = ZB.st === 'boss' ? 5 : 12;
-    if (ZB.left > 0 && act < cap && ZB.drip <= 0) { const z = ents.find(x => x.zk && !ZK[x.zk].boss && !x.alive); if (z) { zombieActivate(z); ZB.left--; ZB.drip = ZB.st === 'boss' ? 6 : 0.8; } }
-    if (ZB.st === 'wave' && ZB.left <= 0 && act === 0) { ZB.st = 'clear'; ZB.t = 9; ZB.revT = 2.5; banner('Oleada superada', 'los caídos vuelven enseguida', 2.4); zombieNet(); }
+    ZB.drip -= dt; const cap = ZB.st === 'boss' ? 8 : 16;
+    if (ZB.left > 0 && act < cap && ZB.drip <= 0) { const z = ents.find(x => x.zk && !ZK[x.zk].boss && !x.alive); if (z) { zombieActivate(z); ZB.left--; ZB.drip = ZB.st === 'boss' ? 3.5 : 0.5; } }
+    if (ZB.st === 'wave' && ZB.left <= 0 && act === 0) { ZB.st = 'clear'; ZB.t = 6; ZB.revT = 2; banner('Oleada superada', 'los caídos vuelven enseguida', 2.4); zombieNet(); }
   } else if (ZB.st === 'clear') {
     ZB.t -= dt; if (ZB.revT > 0) { ZB.revT -= dt; if (ZB.revT <= 0) for (const h of humans) { if (!h.alive) { spawn(h); netSpawnMsg(h); } h.hp = 100; } }
     if (ZB.t <= 0) zombieWaveStart();
@@ -4990,8 +4991,8 @@ const skinShareable = mid => { const M = MODELS[mid]; if (!M) return false; cons
 // ======================= Multijugador (WebRTC con PeerJS) =======================
 // El anfitrión simula bots, daño, bajas y puntuación; cada jugador mueve su propio personaje y manda su estado ~20 veces por segundo.
 const NET = { role: null, peer: null, conns: [], hc: null, code: '', me: 0, players: [], mp: null, acc: 0, ready: new Set(), bus: null, applyKill: false, allowEnd: false, skins: {}, mine: null, mineMsg: '' };
-function netIce() { // servidores STUN (descubren la IP pública) + TURN opcional (relevo para redes que bloquean la conexión directa)
-  const L = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }, { urls: 'stun:stun.relay.metered.ca:80' }];
+function netIce() { // los mismos servidores por defecto de PeerJS (STUN + TURN de relevo) más los que pegues en las opciones
+  const L = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'turn:eu-0.turn.peerjs.com:3478', username: 'peerjs', credential: 'peerjsp' }, { urls: 'turn:us-0.turn.peerjs.com:3478', username: 'peerjs', credential: 'peerjsp' }];
   try { const t = JSON.parse(S.turn || '[]'); if (Array.isArray(t)) L.push(...t); else if (t && t.urls) L.push(t); } catch (e) {}
   return L;
 }
@@ -5062,7 +5063,7 @@ async function netJoin(code, auto) {
     peer.on('error', e => netLeave(e && e.type === 'peer-unavailable' ? 'No existe esa sala (o el anfitrión la cerró). Revisa el código.' : 'Error de conexión (' + (e && e.type) + '). Si tu red bloquea WebRTC, prueba con datos del celular.'));
     peer.on('open', () => {
       NET.stage = 'sala'; netStatus('Buscando la sala ' + code + '…');
-      const c = NET.hc = peer.connect('kzarena-' + code, { reliable: true, serialization: 'json' });
+      const c = NET.hc = peer.connect('kzarena-' + code, { reliable: true });
       c.on('open', () => { netLog('Conexión con la sala abierta'); NET.stage = 'abierta'; netStatus('Conexión abierta, entrando a la sala…'); hello(); }); c.on('data', d => netOnData(c, d)); c.on('close', () => netOnClose(c)); c.on('error', () => netOnClose(c));
       const watch = setInterval(() => { if (NET.role !== 'client' || NET.hc !== c) { clearInterval(watch); return; } const pc = c.peerConnection; if (pc) { NET.ice = pc.iceConnectionState; if (NET.stage === 'sala') netStatus('Abriendo conexión directa con el anfitrión… (' + NET.ice + ')'); } }, 500);
     });
