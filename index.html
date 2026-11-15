@@ -148,7 +148,7 @@
   <div id="feed"></div><div id="modebox" class="hidden"></div><div id="banner"></div>
   <div id="tut"></div><div id="style"><div id="styleRank">D</div><div id="styleBar"><div id="styleFill"></div></div><div id="stylePops"></div></div>
   <div id="equip"></div>
-  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms <span style="opacity:.55">· v24</span></div>
+  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms <span style="opacity:.55">· v26</span></div>
   <div id="movestate"></div>
   <div id="speedo">0 <small>m/s</small></div>
   <div id="hpbox"><div id="hpbar"><div id="hpfill"></div></div><span id="hpnum">100</span></div>
@@ -705,43 +705,97 @@ function buildMall() {
   box(-3, 0, -3, 3, 0.6, 3, C.wallB, { noWall: true }); deco(-2.6, 0.45, -2.6, 2.6, 0.55, 2.6, C.water, 0.2); box(-0.5, 0, -0.5, 0.5, 2.2, 0.5, C.trim); glow(-0.3, 2.2, -0.3, 0.3, 2.5, 0.3, '#bff4ff');
   for (const [x, z] of [[-9, -3], [9, 3], [-9, 4], [9, -4]]) { box(x - 1.3, 0, z - 1.3, x + 1.3, 0.9, z + 1.3, C.pot, { noWall: true }); const cg = new THREE.ConeGeometry(1.2, 2.4, 7); cg.translate(x, 0.9 + 1.2, z); worldGeos.push(colorize(cg.toNonIndexed(), C.plant, 0.15)); }
   for (const [x, z, ax] of [[-6, -7.5, 'x'], [6, 7.5, 'x'], [-11.5, 0, 'z'], [11.5, 0, 'z']]) box(ax === 'x' ? x - 1.5 : x - 0.35, 0, ax === 'x' ? z - 0.35 : z - 1.5, ax === 'x' ? x + 1.5 : x + 0.35, 0.5, ax === 'x' ? z + 0.35 : z + 1.5, C.wood, { mat: 'wood', noWall: true });
-  // ---- tiendas ----
+  // ---- tiendas (sin pasillos traseros: cada local llega hasta el muro exterior) ----
+  const MK = mapKit(), cyl = MK.cyl, cone = MK.cone, blob = MK.blob;
+  const mixc = (hex, k) => '#' + new THREE.Color(hex).lerp(new THREE.Color('#e9e4da'), k).getHexString();
   const SHOPS = [
-    [['Ropa', '#ff6fa8'], ['Zapatos', '#ffb347'], ['Música', '#9b7bff'], ['Café', '#c58b52'], ['Tech', '#3fd0ff']],
-    [['Juguetes', '#ffd23f'], ['Libros', '#7ad957'], ['Farmacia', '#4fe0a0'], ['Deportes', '#ff6b4a'], ['Óptica', '#6fb6ff']],
-    [['Tienda grande', '#ff8a3d'], ['Electrónica', '#3fd0ff'], ['Perfumes', '#e47bff']], [['Gimnasio', '#ff4f6d'], ['Joyería', '#ffe08a'], ['Tienda grande', '#5fd38a']],
-    [['Arcade', '#ff4fd8'], ['Bolos', '#4fb0ff']], [['Restaurante', '#ffb347'], ['Mirador', '#7cf3ff']],
+    [['Tienda por departamentos', '#ff8a3d', 22, 'depto'], ['Ropa', '#ff6fa8', 8, 'gen'], ['Zapatos', '#ffb347', 8, 'gen'], ['Café', '#c58b52', 8, 'gen'], ['Tech', '#3fd0ff', 10, 'gen']],
+    [['Supermercado', '#5fd38a', 24, 'super'], ['Farmacia', '#4fe0a0', 8, 'gen'], ['Banco', '#6fb6ff', 8, 'gen'], ['Óptica', '#9b7bff', 8, 'gen'], ['Juguetes', '#ffd23f', 8, 'gen']],
+    [['Happy Land', '#ff4fa8', 28, 'happy'], ['Libros', '#7ad957', 9, 'gen'], ['Deportes', '#ff6b4a', 9, 'gen'], ['Joyería', '#ffe08a', 10, 'gen']],
+    [['Mejoramiento del hogar', '#ff8a3d', 24, 'hogar'], ['Electrónica', '#3fd0ff', 12, 'gen'], ['Perfumes', '#e47bff', 10, 'gen'], ['Gimnasio', '#ff4f6d', 10, 'gym']],
+    [['Arcade', '#ff4fd8', 16, 'arcade'], ['Bolos', '#4fb0ff', 20, 'bolos'], ['Karaoke', '#ffb347', 10, 'gen'], ['Escape room', '#9b7bff', 10, 'gen']],
+    [['Cine', '#ff4f6d', 24, 'cine'], ['Restaurante', '#ffb347', 16, 'resto'], ['Heladería', '#7cf3ff', 8, 'gen'], ['Pizzería', '#ff6b4a', 8, 'gen']],
   ];
   const shopRow = (lvl, sz, list) => {
-    const y = L[lvl], zf = 14 * sz, zb = 27 * sz, n = list.length, w = 56 / n;
-    // fachada con puerta y escaparate por tienda
+    const y = L[lvl], zf = 14 * sz, zb = 32 * sz;
+    let xa = -28; const cells = list.map(([name, col, w, kind]) => { const c = { name, col, w, kind, x0: xa, x1: xa + w, cx: xa + w / 2 }; xa += w; return c; });
     const ops = [];
-    for (let i = 0; i < n; i++) { const x0 = -28 + i * w, cx = x0 + w / 2; ops.push([cx - 3.6, cx - 1.2, y, y + 3.2]); const wn = i % 2 === 0; ops.push([cx + 0.2, cx + Math.min(5.2, w / 2 - 0.8), y + 0.9, y + 3.0, wn ? null : GL.clear]); }
-    wall('x', zf, -28, 28, y, y + CEIL, ops, { t: 0.3, col: C.wall, mat: 'plaster' });
-    // pared trasera con puertas de servicio
-    wall('x', zb, -28, 28, y, y + CEIL, list.map((_, i) => { const cx = -28 + i * w + w / 2; return [cx + w / 2 - 3.4, cx + w / 2 - 1.4, y, y + 3.0]; }), { t: 0.3, col: C.wallB, mat: 'plaster' });
-    for (let i = 1; i < n; i++) { const x = -28 + i * w; wall('z', x, Math.min(zf, zb) + 0.15, Math.max(zf, zb) - 0.15, y, y + CEIL, [], { t: 0.3, col: C.wall, mat: 'plaster' }); }
-    list.forEach(([name, col], i) => {
-      const x0 = -28 + i * w, x1 = x0 + w, cx = (x0 + x1) / 2, zm = (zf + zb) / 2;
-      deco(x0 + 0.2, y + 0.004, zf + 0.2 * sz, x1 - 0.2, y + 0.014, zb - 0.2 * sz, new THREE.Color(col).lerp(new THREE.Color('#e9e4da'), 0.78), 0);
-      // letrero luminoso sobre la entrada
-      glow(cx - 3.8, y + 3.5, zf - 0.22 * sz, cx + 3.8, y + 4.2, zf - 0.17 * sz, col); lamp(cx, y + 3.4, zf - 1.4 * sz, col, 8, 0.9);
-      lamp(cx, y + 4.2, zm, '#fff3dc', 9, 0.8); glow(cx - 1.5, y + 4.5, zm - 0.3, cx + 1.5, y + 4.58, zm + 0.3, '#fff6e2');
-      // mostrador y estanterías (cobertura)
-      box(cx - 2.2, y, zb - 3.2 * sz, cx + 2.2, y + 1.1, zb - 2.4 * sz, C.wood, { mat: 'wood', noWall: true });
-      box(x0 + 0.5, y, zm - 3, x0 + 1.2, y + 1.9, zm + 3, C.woodD, { mat: 'wood' });
-      if (w > 12) box(cx - 0.4, y, zm - 2.2 * sz - 1.2, cx + 0.4, y + 1.6, zm - 2.2 * sz + 1.2, C.woodD, { mat: 'wood' });
-      box(x1 - 1.2, y, zm - 2, x1 - 0.5, y + 1.9, zm + 2, C.woodD, { mat: 'wood' });
+    cells.forEach((c, i) => {
+      if (c.w >= 20) { ops.push([c.cx - 3, c.cx + 3, y, y + 3.4]); ops.push([c.x0 + 1, c.cx - 4, y + 0.9, y + 3.0, i % 2 ? null : GL.clear]); ops.push([c.cx + 4, c.x1 - 1, y + 0.9, y + 3.0, i % 2 ? GL.clear : null]); }
+      else { ops.push([c.cx - 3.6 + (c.w < 10 ? 1.2 : 0), c.cx - 1.2 + (c.w < 10 ? 1.2 : 0), y, y + 3.2]); ops.push([c.cx + 0.2 + (c.w < 10 ? 1.4 : 0), c.cx + Math.min(5.2, c.w / 2 - 0.8), y + 0.9, y + 3.0, i % 2 === 0 ? null : GL.clear]); }
     });
+    wall('x', zf, -28, 28, y, y + CEIL, ops.filter(o => o[1] - o[0] > 0.5), { t: 0.3, col: C.wall, mat: 'plaster' });
+    for (let i = 1; i < cells.length; i++) wall('z', cells[i].x0, Math.min(zf, zb) + 0.15, Math.max(zf, zb) - 0.15, y, y + CEIL, [], { t: 0.3, col: C.wall, mat: 'plaster' });
+    const zz = d => zf + sz * d;
+    const fb = (x0, d0, x1, d1, h, col, o) => box(x0, y, zz(d0), x1, y + h, zz(d1), col, { mat: 'wood', noWall: true, ...(o || {}) });
+    const fd = (x0, d0, x1, d1, h0, h1, col) => deco(x0, y + h0, zz(d0), x1, y + h1, zz(d1), col, 0);
+    const PAL = ['#ff6fa8', '#ffd23f', '#4fb0ff', '#7ad957', '#ff8a3d', '#9b7bff'];
+    for (const c of cells) {
+      const { x0, x1, cx, w, kind, col } = c, zm = zz(9);
+      deco(x0 + 0.2, y + 0.004, Math.min(zf + 0.2 * sz, zb - 0.2 * sz), x1 - 0.2, y + 0.014, Math.max(zf + 0.2 * sz, zb - 0.2 * sz), mixc(col, 0.78), 0);
+      glow(cx - Math.min(5, w / 2 - 0.5), y + 3.5, zf - 0.22 * sz, cx + Math.min(5, w / 2 - 0.5), y + 4.2, zf - 0.17 * sz, col); lamp(cx, y + 3.4, zf - 1.4 * sz, col, 8, 0.9);
+      for (let k = 0; k < Math.max(1, Math.round(w / 12)); k++) { const lx = x0 + w * (k + 0.5) / Math.max(1, Math.round(w / 12)); lamp(lx, y + 4.2, zz(7), '#fff3dc', 9, 0.8); lamp(lx, y + 4.2, zz(14), '#fff3dc', 9, 0.7); glow(lx - 1.5, y + 4.5, zz(7) - 0.3, lx + 1.5, y + 4.58, zz(7) + 0.3, '#fff6e2'); glow(lx - 1.5, y + 4.5, zz(14) - 0.3, lx + 1.5, y + 4.58, zz(14) + 0.3, '#fff6e2'); }
+      if (kind === 'gen') {
+        box(cx - 2.2, y, zz(15.2), cx + 2.2, y + 1.1, zz(16.0), C.wood, { mat: 'wood', noWall: true });
+        box(x0 + 0.5, y, zm - 3, x0 + 1.2, y + 1.9, zm + 3, C.woodD, { mat: 'wood' }); box(x1 - 1.2, y, zm - 2, x1 - 0.5, y + 1.9, zm + 2, C.woodD, { mat: 'wood' });
+        fb(cx - 0.4, 7, cx + 0.4, 9.4, 1.6, C.woodD, { noWall: false });
+      } else if (kind === 'depto') { // tienda por departamentos: islas de ropa, maniquíes, probadores y cajas
+        for (const d of [5.5, 10.5]) for (let x = x0 + 2.2; x + 3 < x1 - 1.5; x += 4.4) { fb(x, d, x + 3, d + 0.6, 1.5, '#d8d2c6'); fd(x, d - 0.05, x + 3, d + 0.65, 1.5, 1.62, PAL[Math.floor((x - x0) / 4.4) % PAL.length]); }
+        for (let x = x0 + 3; x < x1 - 2; x += 5) { cyl(x, y, zz(3.2), 0.17, 1.3, '#d9d4c8', 6); blob(x, y + 1.55, zz(3.2), 0.17, '#e8e2d6', 1); }
+        fb(x0 + 1, 17.2, x1 - 1, 18, 2.8, '#e2dccf'); for (let x = x0 + 1.4; x < x1 - 3; x += 3) fd(x, 17.15, x + 2.2, 17.2, 0.7, 2.6, PAL[Math.floor(x) & 3]);
+        fb(x1 - 7, 12.5, x1 - 1, 17.2, 2.6, '#c9c2b4'); fd(x1 - 7, 12.4, x1 - 1, 12.5, 0, 2.6, '#8fb6ff');
+        fb(cx - 7, 1.4, cx - 4, 2.4, 1.0, C.wood); fb(cx + 4, 1.4, cx + 7, 2.4, 1.0, C.wood); fb(cx - 0.5, 8, cx + 0.5, 9, 3.4, '#e8e2d6', { noWall: false });
+      } else if (kind === 'super') { // supermercado: pasillos de góndolas y cajas
+        for (const d of [5.4, 8.8, 12.2]) for (const [a, b] of [[x0 + 1.5, x0 + 10.5], [x0 + 14.5, x1 - 1.5]]) { fb(a, d, b, d + 0.9, 1.8, '#e8e4dc'); fd(a, d - 0.03, b, d + 0.93, 1.8, 1.9, PAL[Math.floor(a + d) % PAL.length]); fd(a, d - 0.04, b, d, 0.3, 1.6, PAL[(Math.floor(a) + 2) % PAL.length]); }
+        for (let x = x0 + 2; x < x1 - 3; x += 4.6) { fb(x, 1.3, x + 2.2, 2.3, 1.0, '#c9c2b4'); fd(x, 1.3, x + 2.2, 2.3, 1.0, 1.06, '#2a2f38'); }
+        fb(x0 + 0.6, 16.9, x1 - 0.6, 18, 2.3, '#cfe6ff'); fd(x0 + 0.6, 16.85, x1 - 0.6, 16.9, 0.6, 2.2, '#9fd0ff');
+        fb(x1 - 4.5, 14.2, x1 - 1, 16.2, 1.3, '#d8c38a');
+      } else if (kind === 'happy') { // Happy Land: zona de juegos infantil
+        const px = x0 + 1.5; fb(px, 2.5, px + 8, 9.5, 0.45, '#ffe08a'); for (let i = 0; i < 46; i++) fd(px + 0.4 + (i * 1.7) % 7.2, 2.9 + ((i * 2.3) % 6.2), px + 0.9 + (i * 1.7) % 7.2, 3.4 + ((i * 2.3) % 6.2), 0.45, 0.56, PAL[i % PAL.length]);
+        const tx = x0 + 12.5; fb(tx, 11.5, tx + 3.2, 14.7, 2.4, '#ff6fa8'); fb(tx - 1.6, 12.4, tx, 13.8, 0.8, '#ffd23f'); fb(tx - 3.2, 12.4, tx - 1.6, 13.8, 0.4, '#4fb0ff');
+        addRamp(tx + 3.2, Math.min(zz(11.9), zz(14.3)), tx + 4.8, Math.max(zz(11.9), zz(14.3)), y, y, y + 2.4, 'x', -1, '#4fb0ff', 'wood'); fb(tx + 4.8, 11.9, tx + 5.0, 14.3, 0.5, '#4fb0ff');
+        for (const [dx, dd, hh, cc] of [[x1 - 5, 4, 2.2, '#7ad957'], [x1 - 8.5, 7.5, 1.4, '#ff8a3d'], [x1 - 4, 10.5, 1.8, '#9b7bff'], [x1 - 9, 14, 1.1, '#ffd23f']]) { fb(dx, dd, dx + 2.2, dd + 2.2, hh, cc); }
+        // castillo inflable
+        const kx = x1 - 14, kd = 13.2; fb(kx, kd, kx + 5, kd + 4.6, 0.9, '#7cf3ff'); for (const [ax, ad] of [[0.3, 0.3], [4.7, 0.3], [0.3, 4.3], [4.7, 4.3]]) { cyl(kx + ax, y, zz(kd + ad), 0.45, 2.2, '#ff6fa8', 8); cone(kx + ax, y + 2.2, zz(kd + ad), 0.62, 0.9, '#ffd23f', 8); }
+        fb(cx - 2, 1.2, cx + 2, 2.1, 1.0, '#ffd23f'); fd(cx - 2, 1.2, cx + 2, 2.1, 1.0, 1.06, '#ff4fa8');
+        for (const dx of [-4.5, 4.5]) { cyl(cx + dx, y, zz(1.0), 0.28, 3.4, PAL[Math.abs(dx) > 4 ? 0 : 1], 8); }
+        for (let i = 0; i < 8; i++) blob(x0 + 3 + i * 3, y + 4.0, zz(3 + (i % 3) * 5), 0.38, PAL[i % PAL.length], 1);
+      } else if (kind === 'arcade') { // salón de videojuegos
+        for (const d of [4.2, 7.6, 11, 14.4]) for (let x = x0 + 1.5; x + 1 < x1 - 1.5; x += 1.4) { if (Math.abs(x - cx) < 2.2) continue; fb(x, d, x + 1, d + 0.9, 1.8, '#2a2f45'); fd(x + 0.1, d + (sz > 0 ? 0.9 : -0.04), x + 0.9, d + (sz > 0 ? 0.96 : 0.02), 0.9, 1.6, PAL[Math.floor(x * 3 + d) % PAL.length]); }
+        fb(cx - 2, 1.6, cx + 2, 2.4, 1.0, C.wood);
+      } else if (kind === 'bolos') { // pista de bolos
+        for (let k = 0; k < 6; k++) { const lx = x0 + 1.8 + k * 3.0; fd(lx, 3, lx + 1.3, 16.5, 0.016, 0.03, '#e6c9a0'); fb(lx - 0.35, 3, lx - 0.1, 16.5, 0.3, '#2a2f45'); fb(lx + 1.4, 3, lx + 1.65, 16.5, 0.3, '#2a2f45'); for (let p = 0; p < 4; p++) cone(lx + 0.35 + (p % 2) * 0.6, y + 0.03, zz(16.2), 0.09, 0.35, '#ffffff', 6); }
+        fb(x0 + 0.6, 17, x1 - 0.6, 18, 1.2, '#4fb0ff'); fb(cx - 3, 1.5, cx + 3, 2.4, 1.0, C.wood);
+      } else if (kind === 'cine') { // vestíbulo, dulcería y dos salas
+        fb(x0 + 2, 1.6, x0 + 9, 3.0, 1.1, '#c94a4a'); fd(x0 + 2, 1.6, x0 + 9, 3.0, 1.1, 1.17, '#ffd23f'); fb(x0 + 12, 1.6, x0 + 18, 2.6, 1.0, C.wood);
+        for (let x = x0 + 2; x < x1 - 2; x += 5) { glow(x, y + 1.5, zz(0.4) - 0.02, x + 2, y + 3.3, zz(0.4) + 0.02, PAL[Math.floor(x) % PAL.length]); }
+        for (const [a, b] of [[x0, cx], [cx, x1]]) { wall('x', zz(8), a + 0.15, b - 0.15, y, y + CEIL, [[(a + b) / 2 - 1.3, (a + b) / 2 + 1.3, y, y + 3.0]], { t: 0.3, col: C.dark, mat: 'plaster' });
+          for (let d = 10.5; d < 16.5; d += 1.5) { fb(a + 1.5, d, b - 1.5, d + 0.7, 0.75 + (d - 10) * 0.02, '#8a2f3d', { noWall: true }); }
+          glow(a + 1.2, y + 1.2, zz(17.9) - 0.02 * sz, b - 1.2, y + 3.8, zz(17.9) + 0.02 * sz, '#dfe9ff'); lamp((a + b) / 2, y + 3.2, zz(13), '#9fb8ff', 10, 0.7); }
+      } else if (kind === 'hogar') { // mejoramiento del hogar: estantes altos
+        for (const d of [4.6, 8.6, 12.6]) for (const [a, b] of [[x0 + 1.5, x0 + 10], [x0 + 14, x1 - 1.5]]) { fb(a, d, b, d + 1.0, 3.3, '#c9c2b4'); fd(a, d - 0.03, b, d, 1.0, 3.2, '#ff8a3d'); fd(a, d + 1.0, b, d + 1.03, 1.0, 3.2, '#ff8a3d'); }
+        fb(x0 + 0.6, 16.9, x1 - 0.6, 18, 3.0, '#b9b2a3'); fb(cx - 4, 1.4, cx + 4, 2.3, 1.0, C.wood);
+      } else if (kind === 'gym') {
+        for (const d of [5, 9, 13]) for (let x = x0 + 1.8; x + 1.4 < x1 - 1.5; x += 2.8) { fb(x, d, x + 1.4, d + 2.2, 1.2, '#2a2f45'); fd(x, d, x + 1.4, d + 0.2, 1.2, 1.9, '#ff4f6d'); }
+        fb(cx - 2, 1.4, cx + 2, 2.3, 1.0, C.wood);
+      } else if (kind === 'resto') { // restaurante: mesas y cocina
+        for (const d of [4.5, 8.5, 12.5]) for (let x = x0 + 2.2; x < x1 - 2; x += 3.6) { fb(x, d, x + 1.2, d + 1.2, 0.8, '#a7794f'); fd(x - 0.4, d + 0.1, x - 0.1, d + 1.1, 0, 0.5, '#8a2f3d'); fd(x + 1.3, d + 0.1, x + 1.6, d + 1.1, 0, 0.5, '#8a2f3d'); }
+        fb(x0 + 1, 16.4, x1 - 1, 18, 1.1, '#c9c2b4'); fb(cx - 2, 1.4, cx + 2, 2.2, 1.0, C.wood);
+      }
+    }
   };
   shopRow(0, 1, SHOPS[0]); shopRow(0, -1, SHOPS[1]); shopRow(1, 1, SHOPS[2]); shopRow(1, -1, SHOPS[3]); shopRow(2, 1, SHOPS[4]); shopRow(2, -1, SHOPS[5]);
-  // ---- pasillos de servicio (detrás de las tiendas) ----
-  for (let lvl = 0; lvl < 3; lvl++) for (const sz of [-1, 1]) {
-    const y = L[lvl], z0 = 27 * sz, z1 = 32 * sz;
-    for (let x = -24; x <= 24; x += 12) box(x - 1, y, 30.9 * sz - 0.6, x + 1, y + 1.3, 30.9 * sz + 0.6, C.woodD, { mat: 'wood', noWall: true });
-    for (let x = -26; x <= 26; x += 10) { glow(x - 0.3, y + 4.3, 29.5 * sz - 0.15, x + 0.3, y + 4.5, 29.5 * sz + 0.15, '#ff5050'); lamp(x, y + 4.1, 29.5 * sz, '#ff4a4a', 7, 0.7); }
-    deco(-34, y + 3.9, 31.5 * sz - 0.15, 34, y + 4.1, 31.5 * sz + 0.15, C.metal); // tubería
+  // ---- vestíbulos de las escaleras: cerrados hacia las tiendas (ya no hay pasillos traseros) ----
+  for (let lvl = 0; lvl < 3; lvl++) for (const sx of [-1, 1]) {
+    const y = L[lvl]; wall('z', 28 * sx, 27, 32, y, y + CEIL, [], { t: 0.3, col: C.svc, mat: 'plaster' }); wall('z', 28 * sx, -32, -27, y, y + CEIL, [], { t: 0.3, col: C.svc, mat: 'plaster' });
   }
+  // ---- plaza principal: pisos de lamas, pantallas en columnas y palmeras (inspirado en centros comerciales peruanos) ----
+  for (let lvl = 0; lvl < 3; lvl++) { const y = L[lvl], tones = ['#d9d2c6', '#b7aea0', '#ece7dc', '#a59d90'];
+    for (let k = 0; k < 11; k++) { const z0 = -13.2 + k * 2.4; for (const sx of [-1, 1]) deco(sx < 0 ? -33.6 : 14.4, y + 0.006, z0, sx < 0 ? -14.4 : 33.6, y + 0.016, z0 + 1.2, tones[k % 4], 0); }
+    if (lvl === 0) for (let k = 0; k < 6; k++) { const x0 = -13.2 + k * 4.4; deco(x0, 0.006, -13.6, x0 + 2.2, 0.016, -3.8, tones[k % 4], 0); deco(x0, 0.006, 3.8, x0 + 2.2, 0.016, 13.6, tones[(k + 1) % 4], 0); }
+    for (const [x, z] of [[-14, -10], [14, -10], [-14, 10], [14, 10], [-7, -10], [7, -10], [-7, 10], [7, 10]]) for (const f of [-1, 1]) { glow(x - 0.3, y + 1.2, z + f * 0.46, x + 0.3, y + 3.4, z + f * 0.5, ['#3fd0ff', '#ff6fa8', '#ffd23f', '#7ad957'][(Math.abs(x) + lvl) % 4]); }
+  }
+  for (const [x, z] of [[-11, -7], [11, 7], [-11, 7], [11, -7]]) { cyl(x, 0, z, 0.2, 3.2, '#7a5a3c', 6, 0.14); for (let k = 0; k < 7; k++) { const a = k * 0.9; const g = new THREE.ConeGeometry(0.28, 2.6, 4); g.rotateX(Math.PI / 2 - 0.5); g.rotateY(a); g.translate(x + Math.sin(a) * 1.1, 3.3, z + Math.cos(a) * 1.1); worldGeos.push(colorize(g.toNonIndexed(), '#4f9a52', 0.15)); } }
   // ---- escaleras de emergencia (4 núcleos, cada una en su propio hueco) ----
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
     const X = v => v * sx, Z = v => v * sz, xin = 28 * sx;
@@ -825,7 +879,7 @@ function buildMall() {
     sp(X(44), 0, -28, side); sp(X(40), 0, -4, side); sp(X(40), 0, 4, side); sp(X(36), 0, 28, side); sp(X(45), 5, 2, side); sp(X(36), 5, 26, side); sp(X(36), 5, -28, side); sp(X(45), 10, -28, side); sp(X(36), 10, -2, side); sp(X(36), 15, -20, side);
     sp(X(30), 0, 30, -1); sp(X(30), 5, -30, -1); sp(X(30), 10, 30, -1); sp(X(26), 15, 0, -1);
   }
-  sp(6, 0, 29.5, -1); sp(-6, 0, -29.5, -1);
+  sp(6, 0, 12, -1); sp(-6, 0, -12, -1);
   DUEL_SPAWNS = [new V3(-40, 0, 0), new V3(40, 0, 0)];
 }
 let FLOOR_LEVELS = [0, 4.5, 9];
@@ -3946,7 +4000,7 @@ class ZombieChar {
 }
 const zParams = k => { const P = styleParams('kaze'); P.WALK = ZK[k].speed; P.MAXH = ZK[k].speed * 1.5; P.JUMP = 9.2; P.DJUMP = 0; return P; };
 class ZombieAI {
-  constructor(e, kind) { this.e = e; this.kind = kind; this.nav = new BotAI(e); this.T = null; this.tT = 0; this.cd = 0.5; this.wind = 0; this.stuckT = 0; this.stuckP = new V3(); this.chT = 2 + Math.random() * 3; this.dashT = 1; this.charge = 0; this.hit = false; this.useTail = false; this.vis = false; this.sideT = 0; this.sideDir = 1; this.cl = null; this.clCd = 1 + Math.random() * 2; this.stalk = Math.random() < 0.7; this.nostick = 0; if (ZK[kind].climb) e.m.hook = dt => { if (!this.cl) return false; this.climbStep(dt); return true; }; }
+  constructor(e, kind) { this.e = e; this.kind = kind; this.nav = new BotAI(e); this.T = null; this.tT = 0; this.cd = 0.5; this.wind = 0; this.stuckT = 0; this.stuckP = new V3(); this.chT = 2 + Math.random() * 3; this.dashT = 1; this.charge = 0; this.hit = false; this.useTail = false; this.vis = false; this.nav.partial = true; this.progT = 0; this.lastD = 1e9; this.detT = 0; this.detN = null; this.sideT = 0; this.sideDir = 1; this.cl = null; this.clCd = 1 + Math.random() * 2; this.stalk = Math.random() < 0.7; this.nostick = 0; if (ZK[kind].climb) e.m.hook = dt => { if (!this.cl) return false; this.climbStep(dt); return true; }; }
   reset() { this.cl = null; this.clCd = 1.5; this.e.zLk = 0; this.T = null; this.tT = 0; this.cd = 0.6; this.wind = 0; this.charge = 0; this.nav.path = null; this.e.zAtkP = -1; }
   ceilY() { const p = this.e.m.pos; for (let y = p.y + 2.3; y < p.y + 5.6; y += 0.2) if (pointBlocked(p.x, y, p.z)) return y; return 0; }
   dropClimb(vx, vz) { const e = this.e, m = e.m; this.cl = null; e.zLk = 0; this.clCd = 2.5 + Math.random() * 2; m.grounded = false; m.vel.set(vx || 0, -2, vz || 0); }
@@ -4004,6 +4058,9 @@ class ZombieAI {
     if (Z.tail && this.cd <= 0 && sees && dist > Z.reach + 0.6 && dist < Z.tail) { this.wind = Z.wind * 1.4; this.useTail = true; e.zTail = true; this.cd = 99; return inp; }
     if (dist < Z.reach && Math.abs(dy) < 2.2) { face(10); if (this.cd <= 0) { this.wind = Z.wind; this.useTail = false; } return inp; }
     let tx = T.m.pos.x, tz = T.m.pos.z;
+    // sin avance hacia la presa: prueba una ruta alterna (nodo cercano al azar) y luego vuelve a perseguir
+    this.progT += dt; if (this.progT > 1.0) { if (this.lastD - dist < 0.7 && dist > Z.reach + 1.5) { const cand = []; for (let q = 0; q < 14; q++) { const n = randomNavNode(); const dd = Math.hypot(n.x - m.pos.x, n.z - m.pos.z); if (dd > 5 && dd < 20 && Math.abs(n.y - m.pos.y) < 2.5) cand.push(n); } if (cand.length) { cand.sort((u, v) => Math.hypot(u.x - T.m.pos.x, u.z - T.m.pos.z) - Math.hypot(v.x - T.m.pos.x, v.z - T.m.pos.z)); this.detN = cand[Math.floor(Math.random() * Math.min(3, cand.length))]; this.detT = 1.6; this.nav.path = null; } } this.lastD = dist; this.progT = 0; }
+    if (this.detT > 0 && this.detN) { this.detT -= dt; this.nav.repathT -= dt; if (!this.nav.path || this.nav.repathT <= 0) { this.nav.pathTo(this.detN.x, this.detN.y, this.detN.z); this.nav.repathT = 0.5; } const n = this.nav.followPath(); if (n) { tx = n.x; tz = n.z; if (n.y - m.pos.y > 0.7 && m.grounded) inp.jump = true; } if (this.detT <= 0) { this.nav.path = null; this.nav.repathT = 0; } const ddx = tx - m.pos.x, ddz = tz - m.pos.z, l = Math.hypot(ddx, ddz) || 1; inp.wx = ddx / l; inp.wz = ddz / l; face(9); return inp; }
     _zc.set(m.pos.x, m.pos.y + 0.45, m.pos.z); _zt.set(T.m.pos.x, T.m.pos.y + 0.45, T.m.pos.z); const clearLow = sees && dist < 30 && Math.abs(dy) < 1.6 && los(_zc, _zt);
     if (!clearLow) { // algo se interpone (muro, mueble, desnivel): busca camino de navegación y lo recalcula rápido
       this.nav.repathT -= dt; if (!this.nav.path || this.nav.repathT <= 0) { this.nav.pathTo(T.m.pos.x, T.m.pos.y, T.m.pos.z); this.nav.repathT = Math.min(this.nav.repathT, 0.3) || 0.3; }
@@ -4561,18 +4618,19 @@ function navClosest(x, y, z, r = 5) {
   for (const n of navNear(x, z, r)) { const dy = Math.abs(n.y - y); if (dy > 1.8) continue; const d = Math.hypot(n.x - x, n.z - z) + dy * 2 + (n.links.length ? 0 : 50); if (d < bd) { bd = d; best = n; } }
   return best;
 }
-function navPath(a, b) {
+function navPath(a, b, partial) {
   if (!a || !b) return null; if (a === b) return [b];
   const N = NAV.nodes.length, g = new Float32Array(N).fill(Infinity), came = new Int32Array(N).fill(-1), closed = new Uint8Array(N);
   const heap = []; const push = (i, f) => { heap.push([f, i]); let k = heap.length - 1; while (k > 0) { const p = (k - 1) >> 1; if (heap[p][0] <= heap[k][0]) break; [heap[p], heap[k]] = [heap[k], heap[p]]; k = p; } };
   const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let k = 0; for (;;) { const l = 2 * k + 1, r = l + 1; let m = k; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === k) break; [heap[m], heap[k]] = [heap[k], heap[m]]; k = m; } } return top; };
   const hgt = n => Math.hypot(n.x - b.x, n.y - b.y, n.z - b.z);
-  g[a.i] = 0; push(a.i, hgt(a)); let iter = 0;
+  g[a.i] = 0; push(a.i, hgt(a)); let iter = 0, bestI = -1, bestH = 1e9;
   while (heap.length && iter++ < 6000) {
-    const [, i] = pop(); if (closed[i]) continue; closed[i] = 1;
+    const [, i] = pop(); if (closed[i]) continue; closed[i] = 1; if (partial) { const hh = hgt(NAV.nodes[i]); if (hh < bestH) { bestH = hh; bestI = i; } }
     if (i === b.i) { const out = []; let k = i; while (k >= 0) { out.push(NAV.nodes[k]); k = came[k]; } return out.reverse(); }
     for (const l of NAV.nodes[i].links) { const j = l.n.i, ng = g[i] + l.c; if (ng < g[j]) { g[j] = ng; came[j] = i; push(j, ng + hgt(l.n)); } }
   }
+  if (partial && bestI >= 0 && bestI !== a.i) { const out = []; let k = bestI; while (k >= 0) { out.push(NAV.nodes[k]); k = came[k]; } return out.reverse(); } // sin ruta completa: se acerca todo lo posible
   return null;
 }
 function randomNavNode() { for (let k = 0; k < 20; k++) { const n = NAV.nodes[Math.floor(Math.random() * NAV.nodes.length)]; if (n && n.links.length > 1) return n; } return NAV.nodes[0]; }
@@ -4588,7 +4646,7 @@ class BotAI {
   reset() { this.path = null; this.goalNode = null; this.target = null; this.vis = false; this.lastSeen = null; this.kingPref = Math.random() < 0.75; this.kingSpot = null; }
   pathTo(x, y, z) {
     const m = this.e.m, a = navClosest(m.pos.x, m.pos.y, m.pos.z, 4), b = navClosest(x, y, z, 6);
-    this.path = navPath(a, b); this.pi = 0; this.repathT = 2.5;
+    this.path = navPath(a, b, this.partial); this.pi = 0; this.repathT = 2.5;
     if (this.path && this.path.length > 1) { // saltar el primer punto si ya lo pasé
       const p1 = this.path[1]; if (Math.hypot(p1.x - m.pos.x, p1.z - m.pos.z) < Math.hypot(p1.x - this.path[0].x, p1.z - this.path[0].z)) this.pi = 1;
     }
@@ -5020,11 +5078,12 @@ async function newMatch() {
     if (sk && sk.done) { const id = 'r' + h.nid + '_' + sk.bytes; try { if (!MODELS[id]) await registerModel(id, await netSkinBytes(sk)); mid = id; skId = id; tH = { name: 'keep' + h.nid, hair: '#28355f', top: '#d42c38', line: '#ff2a38', keep: true }; } catch (er) { console.warn('skin remota', er); } }
     const e = new Ent(h.name, await makeChar(false, h.nid, tH, mid), false); e.net = true; e.skinId = skId; e.nid = h.nid; e.team = hTeam; e.tag = nameTag(h.name); e.ch.root.add(e.tag); list.push(e);
   }
+  const skinPool = SKINLIB.map(x => 'u:' + x.id).filter(k => k !== S.skin); for (let q = skinPool.length - 1; q > 0; q--) { const r = Math.floor(Math.random() * (q + 1)); [skinPool[q], skinPool[r]] = [skinPool[r], skinPool[q]]; } // cada bot usa un modelo distinto de tu biblioteca (sin repetir mientras alcancen)
   for (let i = 0; i < nbB; i++) {
     let name = MODE === 'practice' ? `Muñeco ${i + 1}` : BOT_TINTS[i % BOT_TINTS.length].name, tint = null, team = -1;
     if (!TM() && MODE !== 'practice' && MODE !== 'parkour') tint = { ...BOT_TINTS[i % BOT_TINTS.length], top: '#d42c38', line: '#ff2a38', name: BOT_TINTS[i % BOT_TINTS.length].name + '·rojo' }; // enemigos en rojo desde tu punto de vista
     if (TM()) { team = MODE === 'zombies' ? 0 : PICK ? ((i < nBlue ? 0 : 1) === myAbs ? 0 : 1) : i < nAl ? 0 : 1; const k = PICK ? (i < nBlue ? i : i - nBlue) : team === 0 ? i : i - nAl; name = (team === 0 ? ALLY_NAMES : FOE_NAMES)[k % (team === 0 ? ALLY_NAMES.length : FOE_NAMES.length)]; tint = { ...BOT_TINTS[(k + team * 3) % BOT_TINTS.length], top: team === 0 ? '#3a7dff' : '#d42c38', line: team === 0 ? '#4aa8ff' : '#ff2a38', name: (team ? 'rojo-' : 'azul-') + k }; }
-    let bmid = null; if (SKINLIB.length && MODE !== 'practice' && i < 6 && Math.random() < 0.7) { const sk = SKINLIB[(i + Math.floor(Math.random() * SKINLIB.length)) % SKINLIB.length], kk = 'u:' + sk.id; try { if (await ensureSkin(kk)) { bmid = skinModelId(kk); tint = { ...(tint || BOT_TINTS[i % BOT_TINTS.length]), keep: true }; } } catch (er) {} } // variedad: los bots usan skins de tu biblioteca
+    let bmid = null; if (skinPool.length && MODE !== 'practice') { const kk = skinPool[i % skinPool.length]; try { if (await ensureSkin(kk)) { bmid = skinModelId(kk); tint = { ...(tint || BOT_TINTS[i % BOT_TINTS.length]), keep: true }; } } catch (er) {} } // variedad: los bots usan skins de tu biblioteca
     const e = new Ent(name, await makeChar(false, i, tint, bmid), true); e.team = team; e.nid = MP ? MP.players.length + i : list.length;
     if (MODE === 'practice') { const D = PRACTICE.dummies[i]; e.ai = new DummyAI(e, D.k, new V3(...D.p)); }
     list.push(e);
