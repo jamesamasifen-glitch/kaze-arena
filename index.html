@@ -148,7 +148,7 @@
   <div id="feed"></div><div id="modebox" class="hidden"></div><div id="banner"></div>
   <div id="tut"></div><div id="style"><div id="styleRank">D</div><div id="styleBar"><div id="styleFill"></div></div><div id="stylePops"></div></div>
   <div id="equip"></div>
-  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms <span style="opacity:.55">· v13</span></div>
+  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms <span style="opacity:.55">· v14</span></div>
   <div id="movestate"></div>
   <div id="speedo">0 <small>m/s</small></div>
   <div id="hpbox"><div id="hpbar"><div id="hpfill"></div></div><span id="hpnum">100</span></div>
@@ -4991,8 +4991,8 @@ const skinShareable = mid => { const M = MODELS[mid]; if (!M) return false; cons
 // ======================= Multijugador (WebRTC con PeerJS) =======================
 // El anfitrión simula bots, daño, bajas y puntuación; cada jugador mueve su propio personaje y manda su estado ~20 veces por segundo.
 const NET = { role: null, peer: null, conns: [], hc: null, code: '', me: 0, players: [], mp: null, acc: 0, ready: new Set(), bus: null, applyKill: false, allowEnd: false, skins: {}, mine: null, mineMsg: '' };
-function netIce() { // los mismos servidores por defecto de PeerJS (STUN + TURN de relevo) más los que pegues en las opciones
-  const L = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'turn:eu-0.turn.peerjs.com:3478', username: 'peerjs', credential: 'peerjsp' }, { urls: 'turn:us-0.turn.peerjs.com:3478', username: 'peerjs', credential: 'peerjsp' }];
+function netIce() { // la misma lista de la v10 (que sí conectaba) más los servidores que pegues en las opciones
+  const L = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }, { urls: 'stun:stun.relay.metered.ca:80' }];
   try { const t = JSON.parse(S.turn || '[]'); if (Array.isArray(t)) L.push(...t); else if (t && t.urls) L.push(t); } catch (e) {}
   return L;
 }
