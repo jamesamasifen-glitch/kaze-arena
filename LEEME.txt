@@ -1,5 +1,6 @@
 Kaze Arena - subir a GitHub Pages
 1) En github.com: New repository -> nombre "kaze-arena" -> Public -> Create.
-2) "uploading an existing file": arrastra TODOS los archivos de esta carpeta (index.html y los .json) -> Commit changes.
+2) "uploading an existing file": arrastra TODOS los archivos de esta carpeta (index.html, model.json, anims.json y nature_pack.json) -> Commit changes.
+   (guns_pack.json ya NO hace falta: se quitaron las armas sci-fi. Si ya lo habias subido, puedes borrarlo del repositorio.)
 3) Settings -> Pages -> Source: "Deploy from a branch" -> Branch: main, carpeta /(root) -> Save.
 4) Espera 1-2 minutos: tu juego queda en https://TU-USUARIO.github.io/kaze-arena/
