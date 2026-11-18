@@ -148,7 +148,7 @@
   <div id="feed"></div><div id="modebox" class="hidden"></div><div id="banner"></div>
   <div id="tut"></div><div id="style"><div id="styleRank">D</div><div id="styleBar"><div id="styleFill"></div></div><div id="stylePops"></div></div>
   <div id="equip"></div>
-  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms <span style="opacity:.55">· v26</span></div>
+  <div id="perf"><span id="fps">--</span> FPS · <span id="ms">--</span> ms <span style="opacity:.55">· v27</span></div>
   <div id="movestate"></div>
   <div id="speedo">0 <small>m/s</small></div>
   <div id="hpbox"><div id="hpbar"><div id="hpfill"></div></div><span id="hpnum">100</span></div>
@@ -170,7 +170,7 @@
     </aside>
     <main class="main">
     <div class="tab" data-tab="partida">
-    <div class="field" style="margin-bottom:14px"><label>Multijugador · hasta 10 (el resto son bots)</label>
+    <div class="field" style="margin-bottom:14px"><label>Multijugador · hasta 6 jugadores (3 contra 3; el resto son bots)</label>
       <div id="mpStatus" style="font-size:13px;opacity:.85;margin:2px 0 8px">Sin sala. Crea una o escribe el código de tu amigo.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="mpName" placeholder="Tu nombre" maxlength="14" style="width:120px;background:#1c2033;color:#e8ecff;border:1px solid #3a4262;border-radius:7px;padding:7px 9px"><button id="mpCreate" class="big alt" style="font-size:13px;padding:7px 14px">Crear sala</button><input id="mpCode" placeholder="CÓDIGO" maxlength="5" style="width:84px;text-transform:uppercase;background:#1c2033;color:#e8ecff;border:1px solid #3a4262;border-radius:7px;padding:7px 9px"><button id="mpJoin" class="big alt" style="font-size:13px;padding:7px 14px">Unirse</button><button id="mpLeave" class="big alt" style="font-size:13px;padding:7px 14px;display:none">Salir de la sala</button></div>
       <details style="margin-top:8px;font-size:12.5px;opacity:.85"><summary style="cursor:pointer">Opciones de conexión (avanzado)</summary><div style="margin-top:6px">Si tus amigos no logran conectarse, pega aquí los servidores TURN (JSON de la lista «ICE Servers» de un servicio como metered.ca). Se aplica al crear o unirse a una sala.<textarea id="mpTurn" rows="3" placeholder='[{"urls":"turn:...","username":"...","credential":"..."}]' style="width:100%;margin-top:5px;background:#1c2033;color:#e8ecff;border:1px solid #3a4262;border-radius:7px;padding:7px 9px;font-size:12px"></textarea><div style="margin-top:6px">Registro de conexión (si algo falla, cópiame esto):</div><pre id="mpLog" style="max-height:110px;overflow:auto;margin:4px 0 0;padding:6px 8px;background:#12152a;border-radius:7px;font-size:11px;white-space:pre-wrap"></pre></div></details><div id="mpList"></div><div id="mpTeams" style="display:none;gap:10px;margin-top:8px;font-size:13px"></div><div id="mpSkinInfo" style="font-size:12.5px;opacity:.8;margin-top:6px"></div></div>
@@ -178,11 +178,10 @@
     <div class="grid" style="margin-top:6px">
       <div class="field"><label>Mapa <b id="mapNote"></b></label><div class="seg" id="mapSeg"><button data-v="mall">Centro comercial</button><button data-v="school">Academia</button><button data-v="park">Parque de diversiones</button><button data-v="beach">Casas en la playa</button><button data-v="temple">Catedral gótica</button></div></div>
       <div class="field"><label>Hora</label><div class="seg" id="timeSeg"><button data-v="day">Día</button><button data-v="dusk">Atardecer</button><button data-v="night">Noche</button></div></div>
-      <div class="field tdmOnly"><label>Aliados (bots) <b id="alliesLbl"></b></label><input type="range" id="allies" min="0" max="4"></div>
-      <div class="field tdmOnly"><label>Enemigos (bots) <b id="enemiesLbl"></b></label><input type="range" id="enemies" min="1" max="5"></div>
+      <div class="field"><label>Aliados (bots) · tu equipo, contándote a ti, es de 3 como máximo <b id="alliesLbl"></b></label><input type="range" id="allies" min="0" max="2"></div>
+      <div class="field"><label>Enemigos (bots) · 3 como máximo <b id="enemiesLbl"></b></label><input type="range" id="enemies" min="1" max="3"></div>
       <div class="field"><label>Habilidad de los bots <b id="skillLbl"></b></label><input type="range" id="skill" min="0" max="100"></div>
-      <div class="field"><label>Número de bots <b id="botsLbl"></b></label><input type="range" id="bots" min="2" max="7"></div>
-      <div class="field"><label id="goalLbl">Meta de bajas</label><div class="seg" id="goal"><button data-v="15">Corta</button><button data-v="25">Normal</button><button data-v="40">Larga</button></div></div>
+            <div class="field"><label id="goalLbl">Meta de bajas</label><div class="seg" id="goal" style="display:none"><button data-v="15">Corta</button><button data-v="25">Normal</button><button data-v="40">Larga</button></div></div>
     </div>
     </div>
     <div class="tab hidden" data-tab="equipo">
@@ -193,7 +192,7 @@
     <div class="grid">
       <div class="field"><label>Velocidad de movimiento (todos) <b id="mspdLbl"></b></label><input type="range" id="mspd" min="0.7" max="1.5" step="0.05"></div>
       <div class="field"><label>Salto normal <b id="jmpLbl"></b></label><input type="range" id="jmp" min="0.5" max="1.2" step="0.05"></div>
-      <div class="field"><label>Salto con katana / bullet jump <b id="kjmpLbl"></b></label><input type="range" id="kjmp" min="0.4" max="1.3" step="0.05"></div>
+      <div class="field"><label>Salto deslizado <b id="kjmpLbl"></b></label><input type="range" id="kjmp" min="0.4" max="1.3" step="0.05"></div>
       <div class="field"><label>Gravedad (100% = la del juego; la real sería ~35%) <b id="grvLbl"></b></label><input type="range" id="grv" min="0.5" max="1.5" step="0.05"></div>
     </div>
     </div>
@@ -205,7 +204,8 @@
       <div class="field"><label>Sensibilidad del ratón <b id="sensLbl"></b></label><input type="range" id="sens" min="0.2" max="3" step="0.05"></div>
       <div class="field"><label>Volumen <b id="volLbl"></b></label><input type="range" id="vol" min="0" max="1" step="0.05"></div>
       <div class="field"><label>Efectos</label><label class="chk" style="margin:0"><input type="checkbox" id="slowChk"> Cámara lenta en jugadas espectaculares</label></div>
-      <div class="field"><label>Teletransporte</label><label class="chk" style="margin:0"><input type="checkbox" id="tpChk"> Permitir teletransporte con la katana/hoz (20 por partida, 5 s de espera tras lanzarla)</label></div>
+      <div class="field"><label>Teletransporte</label><label class="chk" style="margin:0"><input type="checkbox" id="tpChk"> Permitir teletransporte con la katana/hoz (5 por partida, 5 s de espera tras lanzarla)</label></div>
+      <div class="field"><label>Bots</label><label class="chk" style="margin:0"><input type="checkbox" id="blockChk"> Ver a los bots como cuadrados también de cerca (igual que de lejos)</label></div>
     </div>
     </div>
     <div class="tab hidden" data-tab="mira">
@@ -244,7 +244,7 @@
     </div>
     <div class="tab hidden" data-tab="guia">
     <div class="controls" id="ctrlList"></div>
-    <p class="note"><b>Trepar:</b> salta hacia un borde alto manteniendo la dirección. <b>Slide:</b> funciona parado, corriendo, justo después de un dash (lo cancela conservando la velocidad) y en el aire (mantén C y se activa al aterrizar). <b>Volteretas:</b> doble salto hacia adelante, atrás o a un lado; puedes disparar durante la voltereta. <b>Wall run:</b> salta hacia una pared moviéndote rápido; Espacio para saltar de pared en pared. <b>Katana:</b> lánzala con E y vuelve a pulsar E para teletransportarte donde está (también en pleno vuelo). <b>Cuchillos:</b> tienes 3; recógelos pasando por encima. Esc pausa el juego.</p>
+    <p class="note"><b>Trepar:</b> salta hacia un borde alto manteniendo la dirección. <b>Slide:</b> funciona parado, corriendo, justo después de un dash (lo cancela conservando la velocidad) y en el aire (mantén C y se activa al aterrizar). <b>Doble salto:</b> un segundo salto en el aire, sin volteretas; puedes disparar mientras saltas. <b>Wall run:</b> salta hacia una pared moviéndote rápido; Espacio para saltar de pared en pared. <b>Katana:</b> lánzala con E y vuelve a pulsar E para teletransportarte donde está (también en pleno vuelo). <b>Cuchillos:</b> tienes 3; recógelos pasando por encima. Esc pausa el juego.</p>
     </div>
     </main>
   </div>
@@ -280,9 +280,10 @@ const XH_DEF = { style: 'crossdot', color: '#00ff9c', size: 7, thick: 2, gap: 4,
 const KEY_DEF = { fwd: 'KeyW', back: 'KeyS', left: 'KeyA', right: 'KeyD', jump: 'Space', dash: 'ShiftLeft', slide: 'KeyC', reload: 'KeyR', prev: 'KeyQ', knife: 'KeyG', katana: 'KeyE', melee: 'KeyV', reset: 'KeyT' };
 delete KEY_DEF.knife;
 const KEY_LBL = { fwd: 'Adelante', back: 'Atrás', left: 'Izquierda', right: 'Derecha', jump: 'Saltar / doble salto', dash: 'Dash', slide: 'Deslizar', reload: 'Recargar', prev: 'Arma anterior', knife: 'Lanzar cuchillo', katana: 'Lanzar katana / teletransporte', melee: 'Tajo rápido de katana', reset: 'Reiniciar contrarreloj' };
-const S = { skill: 35, bots: 5, gfx: 'equilibrado', sens: 1, fov: 78, goal: 25, skin: 'default', res: 1, moveSpeed: 1, jumpMul: 0.85, kjumpMul: 0.75, gravMul: 1, moveStyle: 'kaze', tod: 'day', aura1: 'dorado', aura2: 'morado', loadout: ['ak', 'shotgun', 'sniper'], mode: 'ffa', map: 'mall', night: false, allies: 4, enemies: 5, vol: 0.8, slowmo: true, xh: { ...XH_DEF }, keys: { ...KEY_DEF } };
+const S = { skill: 35, bots: 5, gfx: 'equilibrado', sens: 1, fov: 78, goal: 30, skin: 'default', res: 1, moveSpeed: 1, jumpMul: 0.85, kjumpMul: 0.75, gravMul: 1, moveStyle: 'parkour', tod: 'day', aura1: 'dorado', aura2: 'morado', loadout: ['m4', 'shotgun', 'sniper'], mode: 'tdm', map: 'mall', night: false, allies: 2, enemies: 3, botBlocks: true, vol: 0.8, slowmo: true, xh: { ...XH_DEF }, keys: { ...KEY_DEF } };
 try { const sv = JSON.parse(localStorage.getItem('kaze_arena_cfg') || '{}'); Object.assign(S, sv); S.xh = { ...XH_DEF, ...(sv.xh || {}) }; S.xhw = sv.xhw || {}; S.keys = { ...KEY_DEF, ...(sv.keys || {}) }; } catch (e) {}
-S.gfx = 'equilibrado'; S.res = 1; S.moveStyle = 'mix'; S.moveSpeed = 1; S.jumpMul = 0.85; S.kjumpMul = 0.75; S.gravMul = 1; // gráficos y movimiento fijos: no son configurables
+S.gfx = 'equilibrado'; S.res = 1; S.moveStyle = 'parkour'; S.moveSpeed = 1; S.jumpMul = 0.85; S.kjumpMul = 0.75; S.gravMul = 1; // gráficos y movimiento fijos: no son configurables
+S.goal = 30; S.allies = clamp(Math.round(+S.allies || 0), 0, 2); S.enemies = clamp(Math.round(+S.enemies || 1), 1, 3); S.bots = S.allies + S.enemies; if (S.botBlocks === undefined) S.botBlocks = true; S.sfSkin = null; if (S.wskin && /^sf_/.test(S.wskin)) S.wskin = 'clasica'; // máx. 6 jugadores (3 + 3); meta fija de 30 bajas
 const saveS = () => { try { localStorage.setItem('kaze_arena_cfg', JSON.stringify(S)); } catch (e) {} };
 const SK = () => S.skill / 100;
 const MSPD = () => clamp(+S.moveSpeed || 1, 0.7, 1.5);
@@ -2327,7 +2328,7 @@ const WSKINS = {
 // zona lateral de cada arma donde va el dibujo: [z0, z1, y0, y1, medio ancho]
 const DEC_ZONE = { ak: [-0.09, 0.15, 0.03, 0.084, 0.022], m4: [-0.09, 0.16, 0.063, 0.096, 0.022], ar: [-0.09, 0.16, 0.063, 0.096, 0.022], scar: [-0.09, 0.35, 0.06, 0.094, 0.023], dmr: [-0.09, 0.17, 0.06, 0.094, 0.022],
   sniper: [-0.08, 0.3, 0.036, 0.057, 0.025], shotgun: [-0.085, 0.13, 0.03, 0.09, 0.022], sg_auto: [-0.09, 0.14, 0.03, 0.092, 0.024], sg_double: [-0.02, 0.07, 0.03, 0.092, 0.026], smg: [-0.11, 0.16, 0.06, 0.094, 0.025],
-  vector: [-0.09, 0.19, 0.052, 0.104, 0.025], dualuzi: [-0.06, 0.14, 0.058, 0.092, 0.02], magnum: [0.0, 0.16, 0.046, 0.074, 0.018], dualp: [0.0, 0.13, 0.05, 0.076, 0.015] };
+  vector: [-0.09, 0.19, 0.052, 0.104, 0.025], p90: [-0.2, 0.18, 0.03, 0.1, 0.025], dualuzi: [-0.06, 0.14, 0.058, 0.092, 0.02], magnum: [0.0, 0.16, 0.046, 0.074, 0.018], dualp: [0.0, 0.13, 0.05, 0.076, 0.015] };
 function skinDecals(sk) {
   return (id, prof) => {
     const [z0, z1, y0, y1, hx] = DEC_ZONE[id], out = [], H = y1 - y0, ym = (y0 + y1) / 2;
@@ -2340,61 +2341,9 @@ function skinDecals(sk) {
     return out;
   };
 }
-// --- armas sci-fi (pack de 20 modelos): sirven como skin de cualquier arma; 4 materiales recoloreables, sombreado plano horneado, sin brillos ---
-const SF = { ready: false, p: null, raw: new Map(), names: ['AR_1','AR_3','AR_4','SMG_1','SMG_2','Sniper_1','Sniper_2','Sniper_3','Pistol_1','Pistol_2','Pistol_3','Crossbow_1','Crossbow_2'] };
-// variantes por tipo de arma, según su parecido (la granada suelta no se usa: no hay granadas; las ballestas y lanzadores van con las escopetas)
-const WCLASS = { ak: 'rifle', m4: 'rifle', ar: 'rifle', scar: 'rifle', dmr: 'rifle', smg: 'smg', vector: 'smg', dualuzi: 'smg', sniper: 'sniper', shotgun: 'shotgun', sg_auto: 'shotgun', sg_double: 'shotgun', magnum: 'pistol', dualp: 'pistol', revolver: 'pistol' };
-const SF_BY = { rifle: ['AR_1','AR_3','AR_4'], smg: ['SMG_1','SMG_2'], sniper: ['Sniper_1','Sniper_2','Sniper_3'], pistol: ['Pistol_1','Pistol_2','Pistol_3'], shotgun: ['Crossbow_1','Crossbow_2'] };
-const SF_CLS_NAME = { rifle: 'fusiles', smg: 'subfusiles', sniper: 'francotirador', pistol: 'pistolas', shotgun: 'escopetas' };
-const SF_CACHE = new Map();
-function sfFor(n, wid) { const key = n + '|' + wid + '|' + (S.sfMain || '') + (S.sfAcc || ''); let g = SF_CACHE.get(key); if (!g) { g = sfGeo(n, wid); SF_CACHE.set(key, g); } return g; }
-function sfLoad() {
-  if (SF.p) return SF.p;
-  SF.p = (async () => {
-    try {
-      const buf = await packBuf('guns');
-      const hl = new DataView(buf).getUint32(0, true), heads = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 4, hl))), base = (4 + hl + 3) & ~3;
-      for (const h of heads) {
-        let o = base + h.o; const nv = h.nv, ni = h.ni;
-        const q = new Uint16Array(buf, o, nv * 3); o += nv * 6;
-        const nq = new Uint8Array(buf, o, nv * 3); o += nv * 3;
-        const mt = new Uint8Array(buf, o, nv); o += nv; if (o & 1) o++;
-        const ix = new Uint16Array(buf, o, ni);
-        const pos = new Float32Array(nv * 3), nor = new Float32Array(nv * 3);
-        for (let i = 0; i < nv; i++) for (let k = 0; k < 3; k++) { pos[i * 3 + k] = h.mn[k] + q[i * 3 + k] / 65535 * h.sz[k]; nor[i * 3 + k] = nq[i * 3 + k] / 255 * 2 - 1; }
-        SF.raw.set(h.n, { pos, nor, mt, ix, mn: h.mn, sz: h.sz });
-      }
-      SF.ready = true;
-    } catch (e) { console.warn('armas sci-fi', e); }
-  })();
-  return SF.p;
-}
-const SF_COLS = () => ({ 0: '#25262c', 1: '#5a5d68', 2: S.sfAcc || '#c9ccd6', 3: S.sfMain || '#d9772e' });
-function sfGeo(name, wid) { // modelo del pack adaptado al arma 'wid': mismo largo de cañón y altura de mira
-  const m = SF.raw.get(name), mz = WEAPON_MUZZLE[wid]; if (!m) return WEAPON_GEO[wid];
-  const nv = m.mt.length, pos = m.pos, maxZ = m.mn[2] + m.sz[2], halfW = Math.max(Math.abs(m.mn[0]), Math.abs(m.mn[0] + m.sz[0]));
-  let sy = 0, sn = 0; for (let i = 0; i < nv; i++) if (pos[i * 3 + 2] > maxZ - 0.08 * m.sz[2]) { sy += pos[i * 3 + 1]; sn++; }
-  const k = Math.min(mz.z / maxZ, 0.2 / halfW, 1.2), dy = mz.y - (sn ? sy / sn : 0.2) * k;
-  const cols = SF_COLS(), cc = {}; for (const i in cols) { const c = new THREE.Color(cols[i]); cc[i] = [c.r, c.g, c.b]; }
-  const P = new Float32Array(nv * 3), C = new Float32Array(nv * 3);
-  for (let i = 0; i < nv; i++) {
-    P[i * 3] = pos[i * 3] * k; P[i * 3 + 1] = pos[i * 3 + 1] * k + dy; P[i * 3 + 2] = pos[i * 3 + 2] * k;
-    const ny = m.nor[i * 3 + 1], nx = m.nor[i * 3], sh = 0.8 + 0.14 * ny - 0.05 * Math.abs(nx), c = cc[m.mt[i]] || cc[1];
-    C[i * 3] = c[0] * sh; C[i * 3 + 1] = c[1] * sh; C[i * 3 + 2] = c[2] * sh;
-  }
-  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('color', new THREE.BufferAttribute(C, 3));
-  g.setIndex(new THREE.BufferAttribute(m.ix, 1)); g.computeVertexNormals(); g.computeBoundingSphere(); return g;
-}
-for (const n of SF.names) WSKINS['sf_' + n] = { name: 'Sci-fi · ' + n.replace('_', ' '), sf: n };
 const SKIN_GEO = {};
 function skinGeo(id) {
   if (!id || id === 'clasica' || !WSKINS[id]) return WEAPON_GEO;
-  if (WSKINS[id].sf) {
-    if (!SF.ready) return WEAPON_GEO;
-    const key = id + '|' + (S.sfMain || '') + (S.sfAcc || '');
-    if (!SKIN_GEO[key]) { const G = SKIN_GEO[key] = {}; for (const w in WEAPON_GEO) G[w] = WEAPON_GEO[w].userData.melee || w === 'knife' || !WEAPON_MUZZLE[w] ? WEAPON_GEO[w] : sfGeo(WSKINS[id].sf, w); }
-    return SKIN_GEO[key];
-  }
   if (!SKIN_GEO[id]) { const sk = WSKINS[id], G = SKIN_GEO[id] = {}; buildWeapons(G, c => sk[WROLE[c.toLowerCase()]] || c, skinDecals(sk)); }
   return SKIN_GEO[id];
 }
@@ -2460,6 +2409,15 @@ function buildWeapons(GEO, TH, DEC) {
     bx(0.027, 0.16, 0.042, dk, 0, -0.11, 0.12), Z(0.013, 0.2, 0.29, 0.07, dk, 8), Z(0.017, 0.2, 0.225, 0.07, st2, 8), bx(0.052, 0.006, 0.1, '#ff5c7a', 0, 0.03, 0.12),
     prof([[-0.1, 0.105], [-0.265, 0.105], [-0.275, 0.0], [-0.252, 0.0], [-0.243, 0.083], [-0.1, 0.083]], 0.02, dk), bx(0.034, 0.105, 0.008, dk, 0, 0.052, -0.272), grip(dk, -0.02), ...guard(-0.01)]);
   WEAPON_MUZZLE.vector = new V3(0, 0.07, 0.29);
+
+  // --- P90: bullpup compacto con cargador plano encima ---
+  GEO.p90 = merge([
+    prof([[-0.27, 0.02], [-0.27, 0.09], [-0.2, 0.108], [0.2, 0.108], [0.255, 0.08], [0.255, 0.02], [0.12, -0.006], [-0.12, -0.006]], 0.05, '#2a2c33'),
+    bx(0.046, 0.026, 0.34, '#4a4f5c', 0, 0.137, 0.0), bx(0.05, 0.008, 0.36, dk, 0, 0.152, 0.0), ...rail(-0.2, 0.2, 0.158, dk, 0.016),
+    bx(0.02, 0.022, 0.05, dk, 0, 0.17, 0.12), bx(0.012, 0.02, 0.012, dk, 0, 0.17, -0.16),
+    Z(0.012, 0.25, 0.34, 0.07, dk, 8), Z(0.017, 0.33, 0.37, 0.07, dk, 8), bx(0.052, 0.008, 0.16, '#ff7a2f', 0, 0.109, 0.04),
+    prof([[-0.1, 0.0], [-0.03, 0.0], [-0.045, -0.095], [-0.115, -0.09]], 0.032, dk), bx(0.04, 0.09, 0.01, st2, 0, 0.05, -0.274), ...guard(0.02)]);
+  WEAPON_MUZZLE.p90 = new V3(0, 0.07, 0.37);
 
   // --- escopetas ---
   const sgStock = col => prof([[-0.1, 0.092], [-0.1, 0.03], [-0.16, 0.012], [-0.34, -0.035], [-0.362, -0.028], [-0.362, 0.062], [-0.2, 0.088]], 0.038, col);
@@ -2613,7 +2571,7 @@ class CharacterVRM {
     const H = vrm.humanoid;
     this.b = { chest: H.getNormalizedBoneNode('chest'), upper: H.getNormalizedBoneNode('upperChest') || H.getNormalizedBoneNode('chest'), neck: H.getNormalizedBoneNode('neck'), head: H.getNormalizedBoneNode('head'), hand: H.getRawBoneNode('rightHand'), handN: H.getNormalizedBoneNode('rightHand'), handL: H.getRawBoneNode('leftHand'), handLN: H.getNormalizedBoneNode('leftHand') };
     this.pitchSign = model.v0 ? 1 : -1;
-    this.weaponId = 'ar'; this.gun = new THREE.Mesh(WEAPON_GEO.ar, charMat); this.gun.castShadow = true; scene.add(this.gun);
+    this.weaponId = 'm4'; this.gun = new THREE.Mesh(WEAPON_GEO.m4, charMat); this.gun.castShadow = true; scene.add(this.gun);
     this.gun2 = new THREE.Mesh(WEAPON_GEO.dualp, charMat); this.gun2.visible = false; scene.add(this.gun2);
     this.armsN = ['UpperArm', 'LowerArm', 'Hand'].map(n => [H.getNormalizedBoneNode('right' + n), H.getNormalizedBoneNode('left' + n)]);
     this.recoil = 0; this.t = Math.random() * 10; this.blinkT = rand(1, 4); this.bodyYaw = 0; this.landT = 0; this.slideT = 0; this.prevMode = 'ground'; this.springOn = true;
@@ -2628,7 +2586,6 @@ class CharacterVRM {
     P.ph += dt * (4 + hs * 1.1); const sw = Math.sin(P.ph) * 0.9 * run;
     let lL = sw, lR = -sw, rx = 0.1 * run, rz = 0;
     if (st.mode === 'air') { lL = 0.5; lR = -0.25; } else if (st.mode === 'slide') { lL = 1.2; lR = 1.1; rx = -0.9; } else if (st.mode === 'wall') rz = 0.2;
-    if (st.flip) { const a = st.flip.p * Math.PI * 2 * (st.flip.sign || 1); if (st.flip.type === 'side') rz = a; else rx = st.flip.type === 'back' ? -a : a; }
     P.legL.rotation.x = lL; P.legR.rotation.x = lR; P.pv.rotation.set(rx, 0, rz);
     this.recoil = Math.max(0, this.recoil - dt * 12);
     const hand = st.hand === undefined ? this.weaponId : st.hand;
@@ -2661,7 +2618,7 @@ class CharacterVRM {
   resetPhysics() { try { this.vrm.springBoneManager && this.vrm.springBoneManager.reset(); } catch (e) {} }
   setVisible(v) { this.root.visible = v; this.gun.visible = v; if (!v) this.gun2.visible = false; }
   getMuzzle(out) { return out.copy(WEAPON_MUZZLE[this.weaponId]).applyQuaternion(this.gun.quaternion).add(this.gun.position); }
-  geo(id) { if (this.sfPick && SF.ready) { const n = this.sfPick[WCLASS[id]]; if (n && SF.raw.has(n)) return sfFor(n, id); } const G = skinGeo(this.wskin); return id === 'katana' && this.meleeKind === 'scythe' ? G.scythe : G[id]; }
+  geo(id) { const G = skinGeo(this.wskin); return id === 'katana' && this.meleeKind === 'scythe' ? G.scythe : G[id]; }
   setWeapon(id) { if (WEAPON_GEO[id]) { this.weaponId = id; this.gun.geometry = this.geo(id); } }
   animate(dt, st) {
     if (this.far) { this.animateFar(dt, st); return; }
@@ -2882,15 +2839,11 @@ function disposeModel(id) { for (const k in CHAR_POOL) if (k.startsWith(id + '|'
 
 // ======================= Movimiento =======================
 const MOVE_STYLES = {
-  kaze: { name: 'Kaze (actual)', desc: 'Estilo Apex/Fortnite: dash, slide, bullet jump, wall run por impulso y volteretas.' },
-  gunz: { name: 'GunZ', desc: 'Tumble más rápido y frecuente, wall run largo, combos K-style con la katana (saltos entre tajos, se cancelan con salto o dash) y caída en picado (ataca en el aire mirando abajo).', P: { DASH_V: 30, DASH_T: 0.13, DASH_CD: 0.36, WALL_T: 2.4, tumble: true, kstyle: true, massive: true } },
-  warframe: { name: 'Warframe', desc: 'Bullet jump enorme, slide largo y veloz, agarrarse a la pared con una mano y disparar hasta 1,5 s (mantén clic derecho en el aire junto a un muro) y rodar al caer de altura.', P: { SLIDE_FRIC: 1.5, SLIDE_BOOST: 7, bulletMul: 1.6, DJUMP: 10.4, cling: true, landRoll: true } },
-  mix: { name: 'Mixto', desc: 'Warframe al desplazarte (bullet jump enorme, slide largo, agarre a la pared) y GunZ en los enfrentamientos: con un enemigo cerca, al disparar o al recibir daño el dash pasa a ser un tumble rápido y la katana encadena K-style. Sin planeo en el aire.',
-    P: { SLIDE_FRIC: 1.5, SLIDE_BOOST: 7, bulletMul: 1.6, DJUMP: 10.4, cling: true, landRoll: true },
-    PF: { DASH_V: 30, DASH_T: 0.13, DASH_CD: 0.38, WALL_T: 2.2, tumble: true, kstyle: true, massive: true, bulletMul: 1.2 } },
+  parkour: { name: 'Parkour fluido', desc: 'Carrera y salto naturales, doble salto sin volteretas, wall run y trepado de bordes, dash corto y slide breve. Inspirado en GunZ y COD Mobile.',
+    P: { WALK: 8.2, DASH_V: 17, DASH_T: 0.16, DASH_CD: 0.9, SLIDE_BOOST: 1.5, SLIDE_CD: 1.1, SLIDE_FRIC: 6.5, bulletMul: 0.3, DJUMP: 8.6, WALL_T: 2.0, MAXH: 14 } },
 };
 const KJ = () => clamp(+S.kjumpMul || 0.75, 0.4, 1.3);
-const styleParams = (id, fight) => { const st = MOVE_STYLES[id] || MOVE_STYLES.kaze, P = Object.assign({}, PH, st.P || {}, fight && st.PF ? st.PF : {}); const j = clamp(+S.jumpMul || 0.85, 0.5, 1.2), g = clamp(+S.gravMul || 1, 0.5, 1.5); P.JUMP *= j; P.DJUMP *= j; P.GRAV *= g; return P; }; // salto y gravedad regulables en el menú (valen para todos)
+const styleParams = (id, fight) => { const st = id === 'zombie' ? {} : (MOVE_STYLES[id] || MOVE_STYLES.parkour), P = Object.assign({}, PH, st.P || {}, fight && st.PF ? st.PF : {}); const j = clamp(+S.jumpMul || 0.85, 0.5, 1.2), g = clamp(+S.gravMul || 1, 0.5, 1.5); P.JUMP *= j; P.DJUMP *= j; P.GRAV *= g; return P; }; // salto y gravedad regulables en el menú (valen para todos)
 const PH = { WALK: 8.6, GACC: 75, AIRACC: 16, GRAV: 28, JUMP: 10.2, DJUMP: 9.6, DASH_V: 25, DASH_T: 0.16, DASH_CD: 0.7, SLIDE_BOOST: 5.5, SLIDE_CD: 0.9, SLIDE_FRIC: 3.0, MAXH: 34, R: 0.4, H: 1.85, WALL_T: 1.5 };
 function wallProbe(p, n, dy = 1.0) {
   const qx = p.x - n.x * (PH.R + 0.3), qz = p.z - n.z * (PH.R + 0.3), qy = p.y + dy;
@@ -2940,7 +2893,7 @@ class Mover {
     const mid = best.t + Math.min(thick, 1.2) / 2, hs = this.hs();
     const p0 = p.clone(), p2 = new V3(Lx, gy, Lz);
     const p1 = new V3(p.x + dx * mid, 0, p.z + dz * mid); p1.y = 2 * (T + 0.28) - (p0.y + p2.y) / 2;
-    this.special = { type: 'vault', t: 0, dur: clamp(0.3 + landDist * 0.04, 0.32, 0.48), p0, p1, p2, exitV: new V3(dx, 0, dz).multiplyScalar(Math.max(hs, 7.5)) };
+    this.special = { type: 'vault', t: 0, dur: clamp(0.3 + landDist * 0.04, 0.32, 0.48), p0, p1, p2, exitV: new V3(dx, 0, dz).multiplyScalar(clamp(hs, 6, 8.5)) };
     this.sliding = false; this.dashT = 0; this.flip = null; this.wall = null; this.events.push('vault');
     return true;
   }
@@ -3006,7 +2959,7 @@ class Mover {
         const side = Math.sign(n.x * Math.cos(this.yaw) - n.z * Math.sin(this.yaw)) || 1;
         this.wallCd = 0.3; this.wall = null; this.airJumps = 1; this.flip = { t: 0, dur: 0.4, type: 'wj', sign: -side }; this.events.push('walljump');
       } else if (this.grounded || this.coyote > 0) {
-        if (this.sliding) { const bm = this.P.bulletMul || 1, k = hs > 0.1 ? 5.5 * bm * KJ() / hs : 0; this.vel.x += this.vel.x * k; this.vel.z += this.vel.z * k; this.vel.y = this.P.JUMP * 1.28 * KJ() * (bm > 1 ? 1.1 : 1); this.flip = { t: 0, dur: 0.55, type: 'front' }; this.events.push('bullet'); }
+        if (this.sliding) { const bm = this.P.bulletMul || 1, k = hs > 0.1 ? 5.5 * bm * KJ() / hs : 0; this.vel.x += this.vel.x * k; this.vel.z += this.vel.z * k; this.vel.y = this.P.JUMP * 1.05; this.flip = null; this.events.push('bullet'); }
         else { this.vel.y = this.P.JUMP; this.events.push('jump'); }
         this.grounded = false; this.sliding = false; this.coyote = 0; this.dashT = 0; this.airJumps = 1;
       } else if (this.airJumps > 0) {
@@ -3017,16 +2970,16 @@ class Mover {
           const lz = wx * fX + wz * fZ, lx = wx * Math.cos(this.yaw) - wz * Math.sin(this.yaw);
           if (lz < -0.5) type = 'back'; else if (Math.abs(lx) > 0.7) { type = 'side'; sign = -Math.sign(lx); }
         }
-        this.flip = { t: 0, dur: 0.5, type, sign }; this.events.push('djump');
+        this.flip = null; this.events.push('djump'); // doble salto limpio, sin dar vueltas
       }
     }
     if (inp.slide && !this.special) { // deslizar en cualquier momento
       if (this.dashT > 0) { // cancelar el dash en un slide conservando su velocidad
-        const sp = this.P.DASH_V * 0.8; this.vel.x = this.dashDir.x * sp; this.vel.z = this.dashDir.z * sp; this.dashT = 0;
+        const sp = Math.min(this.P.DASH_V * 0.6, 11); this.vel.x = this.dashDir.x * sp; this.vel.z = this.dashDir.z * sp; this.dashT = 0;
         if (this.grounded) { this.sliding = true; this.events.push('slide'); } else this.slideQueued = true;
       } else if (this.grounded) {
         const h2 = this.hs();
-        if (h2 < 6) { let dx, dz; if (h2 > 0.5) { dx = this.vel.x / h2; dz = this.vel.z / h2; } else if (wl > 1e-6) { dx = wx; dz = wz; } else { dx = fX; dz = fZ; } const sp = Math.max(h2 + 3, 7.5); this.vel.x = dx * sp; this.vel.z = dz * sp; }
+        if (h2 < 6) { let dx, dz; if (h2 > 0.5) { dx = this.vel.x / h2; dz = this.vel.z / h2; } else if (wl > 1e-6) { dx = wx; dz = wz; } else { dx = fX; dz = fZ; } const sp = Math.max(h2 + 1.2, 7.0); this.vel.x = dx * sp; this.vel.z = dz * sp; }
         else if (this.slideCd <= 0) { const s = (h2 + this.P.SLIDE_BOOST) / h2; this.vel.x *= s; this.vel.z *= s; this.slideCd = this.P.SLIDE_CD; }
         if (!this.sliding) this.events.push('slide');
         this.sliding = true;
@@ -3135,7 +3088,7 @@ class Mover {
     if (wasG && !this.grounded && v.y <= 0) this.coyote = 0.12;
     if (!wasG && this.grounded) {
       this.airJumps = 1; this.flip = null; this.wall = null; this.landImpact = clamp(-landV / 24, 0, 1); if (landV < -6) this.events.push('land');
-      if (this.slideQueued && this.slideHeldNow) { this.sliding = true; const h2 = this.hs(); if (h2 > 0.5 && h2 < 7.5) { this.vel.x *= 7.5 / h2; this.vel.z *= 7.5 / h2; } this.events.push('slide'); }
+      if (this.slideQueued && this.slideHeldNow) { this.sliding = true; const h2 = this.hs(); if (h2 > 0.5 && h2 < 7.0) { this.vel.x *= 7.0 / h2; this.vel.z *= 7.0 / h2; } this.events.push('slide'); }
       this.slideQueued = false;
     }
     if (this.grounded) { this.wall = null; this.hangUsed = false; }
@@ -3214,50 +3167,43 @@ function updateFx(dt) {
 
 // ======================= Armas =======================
 // Daños pensados para un juego rápido: las armas pesadas matan de un tiro a la cabeza; la SMG necesita 2.
+const M4SND = { f: 2100, low: 190, len: 0.08, vol: 0.85 }; // todas las armas suenan igual que la M4A1
 const WEAPONS = {
-  ar:       { id: 'ar', key: 1, name: 'Fusil Kaze', short: 'Kaze AR', auto: true, rof: 0.092, dmg: 24, head: 50, mag: 30, reload: 1.4, spread: 0.003, move: 0.004, air: 0.005, bloomAdd: 0.0011, bloomMax: 0.007, kick: 0.0055, pen: 0.6, range: 18, pellets: 1, zoom: 0.72, snd: { f: 1900, low: 170, len: 0.09, vol: 0.9 }, tracer: '#fff0b0' },
-  smg:      { id: 'smg', key: 2, name: 'SMG compacta', short: 'SMG', auto: true, rof: 0.066, dmg: 16, head: 50, mag: 50, reload: 1.6, spread: 0.0055, move: 0.002, air: 0.004, bloomAdd: 0.0008, bloomMax: 0.008, kick: 0.0035, pen: 0.45, range: 11, pellets: 1, zoom: 0.8, falloff: [25, 45, 0.7], snd: { f: 2600, low: 220, len: 0.06, vol: 0.7 }, tracer: '#c8fff4' },
-  shotgun:  { id: 'shotgun', key: 3, name: 'Escopeta de corredera', short: 'Corredera', semi: true, rof: 0.68, dmg: 12, head: 24, pellets: 9, mag: 6, reload: 1.7, spread: 0.055, move: 0.008, air: 0.01, bloomAdd: 0, bloomMax: 0, kick: 0.03, pen: 0, range: 6, zoom: 0.85, falloff: [8, 26, 0.25], snd: { f: 900, low: 95, len: 0.22, vol: 1.1 }, tracer: '#ffd9a0' },
-  magnum:   { id: 'magnum', key: 4, cls: 'pistol', name: 'Magnum .50', short: 'Magnum', semi: true, rof: 0.24, dmg: 55, head: 110, mag: 7, reload: 1.5, spread: 0.004, move: 0.016, air: 0.018, bloomAdd: 0.006, bloomMax: 0.014, kick: 0.032, pen: 1.4, range: 22, pellets: 1, zoom: 0.72, snd: { f: 1200, low: 100, len: 0.2, vol: 1.15 }, tracer: '#ffe08a' },
-  ak:       { id: 'ak', name: 'AK-47', short: 'AK-47', auto: true, rof: 0.1, dmg: 28, head: 60, mag: 30, reload: 1.5, spread: 0.0038, move: 0.005, air: 0.006, bloomAdd: 0.0014, bloomMax: 0.009, kick: 0.0075, pen: 0.75, range: 18, pellets: 1, zoom: 0.72, snd: { f: 1500, low: 140, len: 0.11, vol: 1.0 }, tracer: '#ffe0a0' },
-  m4:       { id: 'm4', name: 'M4A1', short: 'M4A1', auto: true, rof: 0.084, dmg: 22, head: 48, mag: 30, reload: 1.35, spread: 0.0025, move: 0.0035, air: 0.0045, bloomAdd: 0.0009, bloomMax: 0.006, kick: 0.0042, pen: 0.55, range: 19, pellets: 1, zoom: 0.7, snd: { f: 2100, low: 190, len: 0.08, vol: 0.85 }, tracer: '#fff6c8' },
-  scar:     { id: 'scar', name: 'SCAR-H', short: 'SCAR', auto: true, rof: 0.108, dmg: 31, head: 66, mag: 20, reload: 1.6, spread: 0.0028, move: 0.0045, air: 0.0055, bloomAdd: 0.0012, bloomMax: 0.0075, kick: 0.0068, pen: 0.85, range: 21, pellets: 1, zoom: 0.68, snd: { f: 1300, low: 120, len: 0.12, vol: 1.05 }, tracer: '#ffe9b8' },
-  vector:   { id: 'vector', name: 'Vector', short: 'Vector', auto: true, rof: 0.052, dmg: 14, head: 32, mag: 33, reload: 1.3, spread: 0.005, move: 0.0018, air: 0.0035, bloomAdd: 0.0007, bloomMax: 0.0075, kick: 0.0028, pen: 0.35, range: 10, pellets: 1, zoom: 0.8, falloff: [22, 40, 0.65], snd: { f: 2900, low: 240, len: 0.05, vol: 0.65 }, tracer: '#c8fff4' },
-  sg_auto:  { id: 'sg_auto', name: 'Escopeta automática', short: 'Esc. auto', semi: true, rof: 0.27, dmg: 9, head: 18, pellets: 8, mag: 8, reload: 2.0, spread: 0.065, move: 0.008, air: 0.01, bloomAdd: 0.004, bloomMax: 0.01, kick: 0.022, pen: 0, range: 6, zoom: 0.85, falloff: [7, 22, 0.25], snd: { f: 1000, low: 100, len: 0.18, vol: 1.0 }, tracer: '#ffd9a0' },
-  sg_double:{ id: 'sg_double', name: 'Escopeta de doble cañón', short: 'Doble cañón', semi: true, rof: 0.16, dmg: 14, head: 28, pellets: 10, mag: 2, reload: 1.8, spread: 0.07, move: 0.008, air: 0.01, bloomAdd: 0, bloomMax: 0, kick: 0.045, pen: 0, range: 5, zoom: 0.85, falloff: [7, 20, 0.2], snd: { f: 800, low: 80, len: 0.26, vol: 1.25 }, tracer: '#ffd9a0' },
-  dualp:    { id: 'dualp', name: 'Pistolas dobles', short: 'Pistolas x2', dual: true, cls: 'pistol', semi: true, rof: 0.11, dmg: 22, head: 46, mag: 24, reload: 1.5, spread: 0.0045, move: 0.004, air: 0.006, bloomAdd: 0.002, bloomMax: 0.01, kick: 0.012, pen: 0.4, range: 14, pellets: 1, zoom: 0.78, snd: { f: 1700, low: 150, len: 0.08, vol: 0.85 }, tracer: '#fff0b0' },
-  dualuzi:  { id: 'dualuzi', name: 'Uzis dobles', short: 'Uzis x2', dual: true, cls: 'pistol', auto: true, rof: 0.048, dmg: 12, head: 26, mag: 64, reload: 1.8, spread: 0.0085, move: 0.003, air: 0.005, bloomAdd: 0.0008, bloomMax: 0.012, kick: 0.003, pen: 0.3, range: 9, pellets: 1, zoom: 0.82, falloff: [18, 34, 0.6], snd: { f: 2800, low: 230, len: 0.05, vol: 0.7 }, tracer: '#c8fff4' },
-  dmr:      { id: 'dmr', name: 'Rifle de tirador', short: 'DMR', semi: true, rof: 0.3, dmg: 46, head: 98, mag: 10, reload: 1.8, spread: 0.0025, adsSpread: 0.0008, move: 0.012, air: 0.02, bloomAdd: 0.003, bloomMax: 0.01, kick: 0.02, pen: 1.4, range: 28, pellets: 1, zoom: 0.45, snd: { f: 1250, low: 95, len: 0.22, vol: 1.15 }, tracer: '#ffffff' },
-  sniper:   { id: 'sniper', key: 5, name: 'Francotirador', short: 'Sniper', semi: true, rof: 0.5, dmg: 75, dmgClose: 100, closeDist: 20, head: 150, mag: 5, reload: 1.8, spread: 0.05, adsSpread: 0.0004, move: 0.02, air: 0.03, bloomAdd: 0, bloomMax: 0, kick: 0.05, pen: 2.5, range: 34, pellets: 1, zoom: 0.26, scope: true, snd: { f: 1100, low: 70, len: 0.35, vol: 1.3 }, tracer: '#ffffff' },
+  m4:       { id: 'm4', key: 1, name: 'M4A1', short: 'M4A1', auto: true, rof: 0.084, dmg: 22, head: 48, mag: 30, reload: 1.35, spread: 0.0025, move: 0.0035, air: 0.0045, bloomAdd: 0.0009, bloomMax: 0.006, kick: 0.0042, pen: 0.55, range: 19, pellets: 1, zoom: 0.7, snd: M4SND, tracer: '#fff6c8' },
+  p90:      { id: 'p90', key: 2, name: 'P90', short: 'P90', auto: true, rof: 0.062, dmg: 15, head: 34, mag: 50, reload: 1.7, spread: 0.0045, move: 0.002, air: 0.004, bloomAdd: 0.0007, bloomMax: 0.007, kick: 0.003, pen: 0.45, range: 12, pellets: 1, zoom: 0.8, falloff: [26, 46, 0.7], snd: M4SND, tracer: '#c8fff4' },
+  shotgun:  { id: 'shotgun', key: 3, name: 'Escopeta', short: 'Escopeta', semi: true, rof: 0.6, dmg: 11, head: 15, pellets: 10, mag: 6, reload: 1.7, spread: 0.06, move: 0.008, air: 0.01, bloomAdd: 0, bloomMax: 0, kick: 0.03, pen: 0, range: 6, zoom: 0.85, falloff: [7, 22, 0.2], snd: M4SND, tracer: '#ffd9a0' },
+  magnum:   { id: 'magnum', key: 4, cls: 'pistol', name: 'Magnum .50', short: 'Magnum', semi: true, rof: 0.24, dmg: 55, head: 110, mag: 7, reload: 1.5, spread: 0.004, move: 0.016, air: 0.018, bloomAdd: 0.006, bloomMax: 0.014, kick: 0.032, pen: 1.4, range: 22, pellets: 1, zoom: 0.72, snd: M4SND, tracer: '#ffe08a' },
+  dualuzi:  { id: 'dualuzi', key: 5, name: 'Uzis dobles', short: 'Uzis x2', dual: true, cls: 'pistol', auto: true, rof: 0.048, dmg: 12, head: 26, mag: 64, reload: 1.8, spread: 0.0085, move: 0.003, air: 0.005, bloomAdd: 0.0008, bloomMax: 0.012, kick: 0.003, pen: 0.3, range: 9, pellets: 1, zoom: 0.82, falloff: [18, 34, 0.6], snd: M4SND, tracer: '#c8fff4' },
+  sniper:   { id: 'sniper', key: 6, name: 'Francotirador', short: 'Sniper', semi: true, rof: 0.5, dmg: 75, dmgClose: 100, closeDist: 20, head: 150, mag: 5, reload: 1.8, spread: 0.05, adsSpread: 0.0004, move: 0.02, air: 0.03, bloomAdd: 0, bloomMax: 0, kick: 0.05, pen: 2.5, range: 34, pellets: 1, zoom: 0.26, scope: true, snd: M4SND, tracer: '#ffffff' },
 };
-WEAPONS.katana = { id: 'katana', key: 6, name: 'Katana', short: 'Katana', melee: true, semi: true, rof: 0.45, dmg: 55, head: 55, mag: 0, reload: 0, spread: 0, move: 0, air: 0, bloomAdd: 0, bloomMax: 0, kick: 0, pen: 0, range: 2.5, pellets: 1, zoom: 1, snd: { f: 1800, low: 200, len: 0.1, vol: 0.4 }, tracer: '#ffffff' };
-const WEAPON_CLASSES = [['Fusiles', ['ak', 'm4', 'scar', 'ar']], ['Subfusiles', ['smg', 'vector']], ['Escopetas', ['shotgun', 'sg_auto', 'sg_double']], ['Pistolas', ['magnum', 'dualp', 'dualuzi']], ['Precisión', ['sniper', 'dmr']]];
-const LOADOUT_DEF = ['ak', 'shotgun', 'sniper'];
-const loadout = () => { const L = (S.loadout || LOADOUT_DEF).filter(id => WEAPONS[id] && !WEAPONS[id].melee); while (L.length < 3) L.push(LOADOUT_DEF.find(x => !L.includes(x)) || 'ar'); return L.slice(0, 3); };
+WEAPONS.katana = { id: 'katana', key: 7, name: 'Katana', short: 'Katana', melee: true, semi: true, rof: 0.45, dmg: 55, head: 55, mag: 0, reload: 0, spread: 0, move: 0, air: 0, bloomAdd: 0, bloomMax: 0, kick: 0, pen: 0, range: 2.5, pellets: 1, zoom: 1, snd: { f: 1800, low: 200, len: 0.1, vol: 0.4 }, tracer: '#ffffff' };
+const WEAPON_CLASSES = [['Fusil', ['m4']], ['Subfusil', ['p90']], ['Escopeta', ['shotgun']], ['Pistolas', ['magnum', 'dualuzi']], ['Precisión', ['sniper']]];
+const LOADOUT_DEF = ['m4', 'shotgun', 'sniper'];
+const loadout = () => { const L = (S.loadout || LOADOUT_DEF).filter(id => WEAPONS[id] && !WEAPONS[id].melee); while (L.length < 3) L.push(LOADOUT_DEF.find(x => !L.includes(x)) || 'm4'); return L.slice(0, 3); };
 const playerOrder = () => [...loadout(), 'katana'];
 const WEAPON_ORDER = playerOrder;
-const BOT_WEAPONS = ['ak', 'm4', 'scar', 'ar', 'smg', 'vector', 'shotgun', 'sg_auto', 'sg_double', 'magnum', 'dualp', 'dualuzi', 'sniper', 'dmr'];
+const BOT_WEAPONS = ['m4', 'p90', 'shotgun', 'magnum', 'dualuzi', 'sniper'];
 const MAT_COST = { wood: 1.0, plaster: 1.2, glass: 0.05 };
 
 const ents = [];
-let player = null, state = 'menu', matchT = 0, kick = 0, ads = 0, adsHeld = false, fireHeld = false;
+let player = null, state = 'menu', matchT = 0, kick = 0, ads = 0, adsHeld = false, fireHeld = false, fireTapT = 0;
 
 class Ent {
   constructor(name, ch, isBot) {
     this.name = name; this.isBot = isBot; this.m = new Mover(); this.ch = ch; scene.add(this.ch.root);
     this.kills = 0; this.deaths = 0; this.alive = true; this.respawnT = 0; this.hp = 100; this.lastDmgT = 99; this.prot = 0;
-    this.weapon = 'ar'; this.mags = {}; this.ammo = WEAPONS.ar.mag; this.reloadT = 0; this.fireCd = 0; this.bloom = 0; this.sinceShot = 9; this.killer = null; this.switchT = 0; this.latch = false; this.prevWeapon = 'smg';
-    this.knives = 3; this.katanaOut = null; this.slashT = -1; this.slashCd = 0; this.combo = 0; this.comboT = 0; this.throwT = -1; this.throwCd = 0; this.teleT = 0; this.tpLeft = 20; this.katCd = 0; this.gg = 0; this.rounds = 0; this.kingS = 0; this.shots = 0; this.hits = 0;
+    this.weapon = 'm4'; this.mags = {}; this.ammo = WEAPONS.m4.mag; this.reloadT = 0; this.fireCd = 0; this.bloom = 0; this.sinceShot = 9; this.killer = null; this.switchT = 0; this.latch = false; this.prevWeapon = 'p90';
+    this.knives = 3; this.katanaOut = null; this.slashT = -1; this.slashCd = 0; this.combo = 0; this.comboT = 0; this.throwT = -1; this.throwCd = 0; this.teleT = 0; this.tpLeft = 5; this.katCd = 0; this.gg = 0; this.rounds = 0; this.kingS = 0; this.shots = 0; this.hits = 0;
     if (isBot) { this.ai = new BotAI(this); this.tag = nameTag(name); this.ch.root.add(this.tag); }
   }
   dispose() { if (this.tag) this.tag.removeFromParent(); this.ch.dispose(); }
 }
 function switchWeapon(e, id, silent) {
-  if (!WEAPONS[id]) id = 'ar';
+  if (!WEAPONS[id]) id = 'm4';
   if (!WEAPONS[id] || (id === e.weapon && !silent)) return;
   if (e.weapon !== id) e.prevWeapon = e.weapon;
   e.mags[e.weapon] = e.ammo; e.weapon = id; e.ammo = e.mags[id] ?? WEAPONS[id].mag;
-  e.reloadT = 0; e.switchT = e.switchDur = silent ? 0 : id === 'katana' ? 0.3 : 0.34; e.bloom = 0; e.latch = true;
+  e.reloadT = 0; e.switchT = e.switchDur = silent ? 0 : id === 'katana' ? 0.2 : 0.12; e.bloom = 0; e.latch = true;
   if (e.ch.setWeapon) e.ch.setWeapon(id);
   if (e === player) { updateWeaponHUD(); if (!silent) beep(520, 0.05, 'triangle', 0.06); }
 }
@@ -3293,7 +3239,7 @@ function spawn(e) {
   const best = pickSpawn(e);
   e.m.reset(best, Math.atan2(-best.x, -best.z));
   e.hp = 100; e.alive = true; e.prot = 2.0; e.mags = {}; e.reloadT = 0; e.bloom = 0; e.lastDmgT = 99; e.ch.setVisible(true); e.ch.resetPhysics();
-  e.m.P = e === player ? styleParams(S.moveStyle) : styleParams('kaze');
+  e.m.P = styleParams('parkour');
   e.knives = 3; e.slashT = -1; e.throwT = -1; e.teleT = 0; if (e.katanaOut) removeProj(e.katanaOut);
   if (MODE === 'practice') {
     if (e.isBot) { const h = e.ai.home; e.m.reset(h, Math.atan2(PRACTICE.start.x - h.x, PRACTICE.start.z - h.z)); e.prot = 0; }
@@ -3301,8 +3247,8 @@ function spawn(e) {
   }
   if (MODE === 'parkour' && e === player) { const s0 = PK_CPS[0].p; e.m.reset(new V3(s0.x, 0, s0.z - 3.5), Math.atan2(PK_CPS[1].p.x - s0.x, PK_CPS[1].p.z - s0.z)); e.prot = 0; }
   if (MODE === 'gungame') switchWeapon(e, GG_ORDER[e.gg], true);
-  else if (MODE === 'single') { if (e.isBot) e.ai.reset(); switchWeapon(e, S.oneWeapon && WEAPONS[S.oneWeapon] && !WEAPONS[S.oneWeapon].melee ? S.oneWeapon : 'ak', true); }
-  else if (e.isBot) { e.ai.reset(); switchWeapon(e, MODE === 'practice' ? 'ar' : BOT_WEAPONS[Math.floor(Math.random() * BOT_WEAPONS.length)], true); }
+  else if (MODE === 'single') { if (e.isBot) e.ai.reset(); switchWeapon(e, S.oneWeapon && WEAPONS[S.oneWeapon] && !WEAPONS[S.oneWeapon].melee ? S.oneWeapon : 'm4', true); }
+  else if (e.isBot) { e.ai.reset(); switchWeapon(e, MODE === 'practice' ? 'm4' : BOT_WEAPONS[Math.floor(Math.random() * BOT_WEAPONS.length)], true); }
   else switchWeapon(e, playerOrder().includes(e.weapon) ? e.weapon : loadout()[0], true);
   if (e.isBot && MODE === 'gungame') e.ai.reset();
   e.ammo = WEAPONS[e.weapon].mag;
@@ -3372,7 +3318,7 @@ function fireShot(e) {
       spawnPuff(end, hitE.ch.pal.accent || '#ff6680', 0.3);
     } else if (stop) spawnPuff(end, '#ffffff', 0.3);
   }
-  if (e === player) { e.shots++; if (_dmgAcc.size) e.hits++; }
+  if (e === player) { e.shots++; fireTapT = 0; if (_dmgAcc.size) e.hits++; }
   for (const [t, acc] of _dmgAcc) damage(t, e, Math.round(acc.d), acc.head, acc.at, acc.walls > 0);
   e.bloom = Math.min(W.bloomMax, e.bloom + W.bloomAdd); e.ammo--; e.sinceShot = 0; e.ch.recoil = 1;
   if (e === player) { kick += W.kick * (1 - ads * 0.4); sfxGun(W, 1); }
@@ -3442,7 +3388,7 @@ const isMeleeCause = c => c === 'katana' || c === 'slideAtk';
 function startSlash(e) {
   if (e.prop >= 0) return false;
   if (!e.alive || e.slashT >= 0 || e.slashCd > 0 || e.katanaOut || e.m.special || e.throwT >= 0) return false;
-  const m = e.m, canSlide = e.ch.act && e.ch.act.swordslide;
+  const m = e.m, canSlide = false; // sin tajo deslizante
   e.slashHit = false; e.hitSet = new Set(); e.reloadT = 0; e.slashT = 0; e.prot = 0;
   if (canSlide && m.grounded && (m.sliding || m.hs() > 9)) { // tajo deslizante (animación de espada deslizándose)
     e.slideAtk = true; e.slashDur = SLIDE_ATK.dur; e.slashCd = SLIDE_ATK.dur * 0.95; e.comboT = 0;
@@ -3457,11 +3403,8 @@ function startSlash(e) {
     if (e === player) whoosh(0.25, 300, 1600, 0.3); return true;
   }
   e.combo = e.comboT > 0 ? (e.combo + 1) % 3 : 0; const C = COMBO[e.combo];
-  const sd = C.dur * (e.melee === 'scythe' ? 1.2 : 1); e.slashDur = sd; e.comboT = sd + 0.55; e.slashCd = sd * 0.82;
-  aimDir(m.yaw, 0, _u); const ks = m.P.kstyle, boost = ks ? 6 : m.grounded ? 3.5 : 5;
-  m.vel.x += _u.x * boost; m.vel.z += _u.z * boost;
-  if (ks && m.grounded) { m.vel.y = 4.6 * KJ(); m.grounded = false; } // K-style: cada tajo da un pequeño salto
-  else if (!m.grounded) m.vel.y = Math.max(m.vel.y, ks ? 3.2 : 1.8);
+  const sd = C.dur; e.slashDur = sd; // la hoz tiene la misma velocidad que la katana e.comboT = sd + 0.55; e.slashCd = sd * 0.82;
+  // sin impulso: el tajo no te empuja ni te hace saltar
   return true;
 }
 const _mx = new V3();
@@ -3594,7 +3537,7 @@ function capsuleFree(x, y, z) { // ¿cabe el cuerpo (radio 0,4, alto 1,85) en es
 }
 function katanaTeleport(e) {
   const p = e.katanaOut; if (!p || !e.alive || e.m.special) return false;
-  if (!TPOK || e.tpLeft <= 0) { if (e === player) { beep(200, 0.1, 'square', 0.06); banner(TPOK ? 'Sin teletransportes' : 'Teletransporte desactivado', TPOK ? 'Ya usaste los 20 de esta partida' : 'El anfitrión lo desactivó en esta partida', 1.2); } return false; }
+  if (!TPOK || e.tpLeft <= 0) { if (e === player) { beep(200, 0.1, 'square', 0.06); banner(TPOK ? 'Sin teletransportes' : 'Teletransporte desactivado', TPOK ? 'Ya usaste los 5 de esta partida' : 'El anfitrión lo desactivó en esta partida', 1.2); } return false; }
   const tgt = _tpA.copy(p.pos);
   if (p.state === 'stuck' && p.n) {
     if (p.n.y > 0.6) tgt.addScaledVector(p.n, 0.05);
@@ -3635,7 +3578,7 @@ function tickCombat(e, dt) {
   if (e.slashT >= 0) {
     e.slashT += dt; const p = e.slashT / e.slashDur;
     if (e.slideAtk) { if (p >= SLIDE_ATK.from && p <= SLIDE_ATK.to) { if (!e.slashHit) { e.slashHit = true; if (e === player || e.m.pos.distanceTo(player.m.pos) < 25) whoosh(e === player ? 0.22 : 0.08, 1800, 400, 0.2); } slashHit(e, SLIDE_ATK.dmg, SLIDE_ATK.range, 1.3, 'slideAtk'); } }
-    else { const C = COMBO[e.combo]; if (!e.slashHit && p >= C.hit) { e.slashHit = true; if (e === player || e.m.pos.distanceTo(player.m.pos) < 25) whoosh(e === player ? 0.2 : 0.08, 1800, 500, 0.16); slashHit(e, C.dmg, e.melee === 'scythe' ? 3.9 : 3.1, e.melee === 'scythe' ? 1.05 : 0.9, 'katana'); } }
+    else { const C = COMBO[e.combo]; if (!e.slashHit && p >= C.hit) { e.slashHit = true; if (e === player || e.m.pos.distanceTo(player.m.pos) < 25) whoosh(e === player ? 0.2 : 0.08, 1800, 500, 0.16); slashHit(e, e.melee === 'scythe' ? Math.round(C.dmg * 0.6) : C.dmg, e.melee === 'scythe' ? 2.6 : 3.1, e.melee === 'scythe' ? 0.55 : 0.9, 'katana'); } }
     if (p >= 1) { e.slashT = -1; e.slideAtk = false; }
   }
 }
@@ -3705,22 +3648,22 @@ function banner(title, sub = '', dur = 1.6) { const b = $('banner'); b.innerHTML
 // ======================= Modos de juego =======================
 const MODES = {
   ffa: { name: 'Todos contra todos', desc: 'El primero en llegar a la meta de bajas gana.' },
-  gungame: { name: 'Gun Game', desc: 'Todos empiezan con la misma arma y cada baja te da la siguiente, de la más débil a la más fuerte: pistolas dobles, Vector, escopeta, M4A1, francotirador y katana. No puedes elegir arma. Gana quien consiga una baja con la katana; un tajo de katana le baja un nivel a la víctima.' },
+  gungame: { name: 'Gun Game', desc: 'Todos empiezan con la misma arma y cada baja te da la siguiente, de la más débil a la más fuerte: Uzis dobles, Magnum, P90, escopeta, M4A1, francotirador y katana. No puedes elegir arma. Gana quien consiga una baja con la katana; un tajo de katana le baja un nivel a la víctima.' },
   single: { name: 'Una sola arma', desc: 'Todos usan la misma arma, elegida antes de empezar (la katana sigue disponible con E y V). Gana quien llegue primero a la meta de bajas.' },
   king: { name: 'Rey de la Torre', desc: 'Controla el campanario de la torre del reloj (usa el trampolín de dentro). Sumas un punto por segundo si estás solo en la zona.' },
   duel: { name: 'Duelo 1 vs 1', desc: 'Rondas a una vida contra un solo bot. Gana quien llegue primero a las rondas de la meta.' },
   parkour: { name: 'Contrarreloj', desc: 'Recorrido por aros entre patios, tejados y la torre. Tu mejor tiempo se guarda y aparece un fantasma con esa carrera. T reinicia.' },
-  tdm: { name: 'Team Deathmatch', desc: 'Equipo azul contra equipo rojo, hasta 5 por lado entre bots (y amigos más adelante). Sin fuego amigo. Reapareces lejos de los enemigos. Gana el primer equipo en llegar a la meta de bajas.' },
+  tdm: { name: 'Team Deathmatch', desc: 'Equipo azul contra equipo rojo, 3 contra 3 (tú, tus amigos y bots). Sin fuego amigo. Reapareces lejos de los enemigos. Gana el primer equipo en llegar a la meta de bajas.' },
   hide: { name: 'Escondite', desc: 'Los escondidos se transforman en objetos (barril, caja, banco…) y se quedan quietos; los buscadores tienen que encontrarlos. Hay objetos falsos repartidos por el mapa y disparar a uno te quita vida. Un escondido atrapado pasa a buscador. Los escondidos ganan si sobreviven 3 minutos. Con F cambias de objeto.' },
   squad: { name: 'Duelo de escuadras', desc: 'Tu escuadra (tú, tus amigos y aliados bots) contra la escuadra rival, una sola vida por ronda. Cuando un equipo queda eliminado, el otro gana la ronda. Gana la escuadra que llegue a 5 rondas.' },
   zombies: { name: 'Zombies', desc: 'Sobrevive a oleadas de zombies agresivos (corredores y espinosos) con tus amigos. Tras las oleadas aparece un jefe al azar: derrótalo y ganáis. Los caídos reviven al terminar cada oleada.' },
   practice: { name: 'Campo de práctica', desc: 'Muñecos quietos, que se mueven y que saltan a distintas distancias. Nadie te dispara. Mide tu daño y tu precisión.' },
 };
-const GG_ORDER = ['dualp', 'vector', 'shotgun', 'm4', 'sniper', 'katana'];
+const GG_ORDER = ['dualuzi', 'magnum', 'p90', 'shotgun', 'm4', 'sniper', 'katana'];
 let MODE = 'ffa', TPOK = true, GO_FN = null;
 const TM = () => MODE === 'tdm' || MODE === 'squad' || MODE === 'zombies' || MODE === 'hide'; // modos con equipos (los amigos siempre van en el equipo 0)
 const ONELIFE = () => MODE === 'duel' || MODE === 'squad';
-const modeGoal = () => MODE === 'squad' ? 5 : MODE === 'zombies' ? 1 : MODE === 'tdm' ? ({ 15: 30, 25: 50, 40: 75 }[S.goal] || 50) : MODE === 'king' ? ({ 15: 45, 25: 60, 40: 90 }[S.goal] || 60) : MODE === 'duel' ? ({ 15: 3, 25: 5, 40: 7 }[S.goal] || 5) : MODE === 'gungame' ? GG_ORDER.length : S.goal;
+const modeGoal = () => MODE === 'squad' ? 5 : MODE === 'zombies' ? 1 : MODE === 'tdm' ? 30 : MODE === 'king' ? 60 : MODE === 'duel' ? 5 : MODE === 'gungame' ? GG_ORDER.length : 30;
 const modeScore = e => MODE === 'squad' ? SQ.score[e.team] : MODE === 'zombies' ? e.kills : MODE === 'tdm' ? TEAM.score[e.team] : MODE === 'gungame' ? e.gg + 1 : MODE === 'king' ? Math.floor(e.kingS) : MODE === 'duel' ? e.rounds : e.kills;
 const MODE_COL = { squad: 'Rondas', zombies: 'Bajas', tdm: 'Equipo', ffa: 'Bajas', single: 'Bajas', gungame: 'Nivel', king: 'Puntos', duel: 'Rondas', parkour: 'Bajas', practice: 'Bajas' };
 // --- Rey de la Torre ---
@@ -3791,7 +3734,7 @@ function pkGhost(dt) {
   aimDir(yaw, a[5], _gv);
   ch.animate(dt, { mode: mode === 'vault' || mode === 'climb' ? 'ground' : mode, hs: Math.hypot(a[6], a[7]), lx: a[6], lz: a[7], vy: a[8], yaw, pitch: a[5], aim: _gv, alive: true, ads: false, sinceShot: 9,
     flip: fl >= 0 ? { p: a[11], type: ['front', 'back', 'side'][fl], sign: a[12] } : null,
-    special: mode === 'vault' || mode === 'climb' ? { type: mode, p: a[13] } : null, reloadP: -1, wallLean: 0, land: 0, meleeP: -1, throwP: -1, hand: 'ar' });
+    special: mode === 'vault' || mode === 'climb' ? { type: mode, p: a[13] } : null, reloadP: -1, wallLean: 0, land: 0, meleeP: -1, throwP: -1, hand: 'm4' });
 }
 function pkUpdate(dt) {
   if (!player || !player.alive) return;
@@ -3998,7 +3941,7 @@ class ZombieChar {
     if (R.extra) { if (this.kind === 'lamedor') R.extra.rotation.x = 0.15 + Math.sin(this.t * 0.6) * 0.15; else { R.extra.rotation.y = Math.sin(this.t * 0.45) * 0.25; R.extra.rotation.x = atk >= 0 && e.zTail ? -0.2 - 1.1 * Math.sin(Math.min(1, atk) * Math.PI * 0.8) : 0; } }
   }
 }
-const zParams = k => { const P = styleParams('kaze'); P.WALK = ZK[k].speed; P.MAXH = ZK[k].speed * 1.5; P.JUMP = 9.2; P.DJUMP = 0; return P; };
+const zParams = k => { const P = styleParams('zombie'); P.WALK = ZK[k].speed; P.MAXH = ZK[k].speed * 1.5; P.JUMP = 9.2; P.DJUMP = 0; return P; };
 class ZombieAI {
   constructor(e, kind) { this.e = e; this.kind = kind; this.nav = new BotAI(e); this.T = null; this.tT = 0; this.cd = 0.5; this.wind = 0; this.stuckT = 0; this.stuckP = new V3(); this.chT = 2 + Math.random() * 3; this.dashT = 1; this.charge = 0; this.hit = false; this.useTail = false; this.vis = false; this.nav.partial = true; this.progT = 0; this.lastD = 1e9; this.detT = 0; this.detN = null; this.sideT = 0; this.sideDir = 1; this.cl = null; this.clCd = 1 + Math.random() * 2; this.stalk = Math.random() < 0.7; this.nostick = 0; if (ZK[kind].climb) e.m.hook = dt => { if (!this.cl) return false; this.climbStep(dt); return true; }; }
   reset() { this.cl = null; this.clCd = 1.5; this.e.zLk = 0; this.T = null; this.tT = 0; this.cd = 0.6; this.wind = 0; this.charge = 0; this.nav.path = null; this.e.zAtkP = -1; }
@@ -4243,10 +4186,10 @@ const TUT_STEPS = [
   ['djump', () => `Salta (${keyName(S.keys.jump)}) y vuelve a saltar en el aire`],
   ['dash', () => `Dash rápido con ${keyName(S.keys.dash)}`],
   ['slide', () => `Corre y deslízate con ${keyName(S.keys.slide)}`],
-  ['bullet', () => `Bullet jump: salta mientras te deslizas`],
+  ['bullet', () => `Salto deslizado: salta mientras te deslizas`],
   ['wallrun', () => `Corre por una pared: salta hacia ella de lado y sigue empujando`],
   ['wallclimb', () => `Escala: salta de frente contra una pared`],
-  ['throw', () => `Lanza la katana con ${keyName(S.keys.katana)}`],
+  ['throw', () => `Lanza la katana con ${keyName(S.keys.katana)} (teletransporte: 5 por partida)`],
   ['tele', () => `Pulsa ${keyName(S.keys.katana)} otra vez para teletransportarte a ella`],
   ['head', () => `Dispara a la cabeza de un muñeco`],
 ];
@@ -4508,12 +4451,14 @@ function updateAuras(dt) {
   if (AURA.rankT <= 0) {
     AURA.rankT = 0.5;
     const sc = e => TM() || MODE === 'ffa' || MODE === 'duel' ? e.kills : modeScore(e);
-    const r = ents.filter(e => sc(e) > 0).sort((a, b) => sc(b) - sc(a) || a.deaths - b.deaths);
-    AURA.top = [r[0] || null, r[1] || null];
+    // en equipos (Team Deathmatch / escuadras): azul para el mejor de tu equipo y rojo para el mejor del rival; en el resto, azul para el mejor de la partida
+    const vs = MODE === 'tdm' || MODE === 'squad';
+    const best = f => ents.filter(e => sc(e) > 0 && f(e)).sort((a, b) => sc(b) - sc(a) || a.deaths - b.deaths)[0] || null;
+    AURA.top = vs && player ? [best(e => e.team === player.team), best(e => e.team !== player.team)] : [best(() => true), null]; // equipos: el mejor de cada bando
   }
   for (const e of ents) {
     const rank = e === AURA.top[0] ? 0 : e === AURA.top[1] ? 1 : -1, offM = MODE === 'practice' || MODE === 'parkour';
-    const k = offM || rank < 0 ? null : 'volt', cid = rank === 0 ? (AURA_COLS[S.aura1] ? S.aura1 : 'dorado') : (AURA_COLS[S.aura2] ? S.aura2 : 'morado'), key = k ? k + ':' + cid : null;
+    const k = offM || rank < 0 ? null : 'volt', cid = rank === 1 ? 'rojo' : 'azul', key = k ? k + ':' + cid : null;
     let a = AURA.list.get(e);
     if (a && a.userData.key !== key) { a.userData.blade.removeFromParent(); scene.remove(a); AURA.list.delete(e); a = null; }
     if (!k || state === 'menu') continue;
@@ -4642,8 +4587,9 @@ class BotAI {
     this.e = e; this.target = null; this.vis = false; this.scan = Math.random() * 0.25; this.react = 0; this.strafe = 1; this.strafeT = 0;
     this.err = { y: 0, p: 0, ty: 0, tp: 0, t: 0 }; this.goalNode = null; this.path = null; this.pi = 0; this.repathT = 0; this.lastSeen = null; this.lastSeenT = 99;
     this.acroT = rand(1, 3); this.burst = 0; this.pause = 0; this.stuckT = 0; this.stuckPos = new V3(); this.djT = -1; this.slideHold = 0; this.headAim = false; this.semiT = 0;
+    this.trail = []; this.trailT = 0; this.back = 0; this.stuckN = 0; this.stuckLong = 0;
   }
-  reset() { this.path = null; this.goalNode = null; this.target = null; this.vis = false; this.lastSeen = null; this.kingPref = Math.random() < 0.75; this.kingSpot = null; }
+  reset() { this.path = null; this.goalNode = null; this.target = null; this.vis = false; this.lastSeen = null; this.kingPref = Math.random() < 0.75; this.kingSpot = null; this.trail = []; this.back = 0; this.stuckN = 0; this.stuckLong = 0; }
   pathTo(x, y, z) {
     const m = this.e.m, a = navClosest(m.pos.x, m.pos.y, m.pos.z, 4), b = navClosest(x, y, z, 6);
     this.path = navPath(a, b, this.partial); this.pi = 0; this.repathT = 2.5;
@@ -4782,8 +4728,29 @@ class BotAI {
     if (this.slideHold > 0) { this.slideHold -= dt; inp.slideHeld = true; if (this.slideHold <= 0 && m.sliding && !indoors && Math.random() < 0.2 + 0.6 * sk) inp.jump = true; }
     if (e.lastDmgT < 0.03 && Math.random() < 0.5 * sk) inp.dash = true;
     // atascado: rehacer ruta o saltar
+    // rastro: puntos por donde ha pasado, para poder volver por el mismo camino si se atasca en una pared o habitación
+    this.trailT -= dt;
+    if (this.trailT <= 0 && m.grounded && this.back <= 0) { this.trailT = 0.6; const lt = this.trail[this.trail.length - 1]; if (!lt || Math.hypot(lt.x - mp.x, lt.z - mp.z) > 2.2 || Math.abs(lt.y - mp.y) > 1.2) { this.trail.push({ x: mp.x, y: mp.y, z: mp.z }); if (this.trail.length > 30) this.trail.shift(); } }
     this.stuckT += dt;
-    if (this.stuckT > 1.2) { if (this.stuckPos.distanceTo(mp) < 1.0 && gl > 0) { this.path = null; this.repathT = 0; if (m.grounded) { inp.jump = true; } inp.wx = -gz; inp.wz = gx; } this.stuckPos.copy(mp); this.stuckT = 0; }
+    if (this.stuckT > 1.0) {
+      const moved = this.stuckPos.distanceTo(mp), closeFight = combat && T && T.m.pos.distanceTo(mp) < 7;
+      if (moved < 0.8 && (gl > 0 || this.back > 0) && !closeFight) {
+        this.path = null; this.repathT = 0; this.stuckN++; this.stuckLong++; if (m.grounded) inp.jump = true;
+        if (this.stuckN >= 2 && this.back <= 0 && this.trail.length) this.back = 3.5; // no sabe salir: vuelve por donde vino
+        else { inp.wx = -gz; inp.wz = gx; }
+        if (this.stuckLong >= 7) { // último recurso: regresa a un punto por el que ya pasó (o a un nodo libre) y sigue buscando combate
+          const q = this.trail.length ? this.trail[0] : randomNavNode(); m.pos.set(q.x, q.y, q.z); m.vel.set(0, 0, 0); this.trail.length = 0; this.back = 0; this.stuckLong = 0; this.stuckN = 0;
+        }
+      } else if (moved >= 2.0) { this.stuckN = 0; this.stuckLong = 0; }
+      this.stuckPos.copy(mp); this.stuckT = 0;
+    }
+    if (this.back > 0) {
+      this.back -= dt; let tp = null;
+      while (this.trail.length) { const q = this.trail[this.trail.length - 1]; if (Math.hypot(q.x - mp.x, q.z - mp.z) < 1.4 && Math.abs(q.y - mp.y) < 1.6) this.trail.pop(); else { tp = q; break; } }
+      if (tp) { const bx = tp.x - mp.x, bz = tp.z - mp.z, bl = Math.hypot(bx, bz) || 1; inp.wx = bx / bl; inp.wz = bz / bl; if (m.grounded && pointBlocked(mp.x + inp.wx * 0.9, mp.y + 0.45, mp.z + inp.wz * 0.9) && !pointBlocked(mp.x + inp.wx * 0.9, mp.y + 2.0, mp.z + inp.wz * 0.9)) inp.jump = true; }
+      else this.back = 0;
+      if (this.back <= 0) { this.stuckN = 0; this.path = null; const foes = ents.filter(o => o.alive && isEnemy(e, o)).sort((a, b) => a.m.pos.distanceTo(mp) - b.m.pos.distanceTo(mp)); if (foes.length) { this.lastSeen = (this.lastSeen || new V3()).copy(foes[0].m.pos); this.lastSeenT = 0; this.huntT = rand(1.5, 3); } } // y vuelve a buscar el combate
+    }
     // recarga y cambio de arma
     if (e.ammo <= 0 && e.reloadT <= 0) reload(e);
     if (!combat && e.ammo < WEAPONS[e.weapon].mag * 0.4 && e.reloadT <= 0) reload(e);
@@ -4827,7 +4794,7 @@ canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('mousedown', e => {
   if (state !== 'playing' || uiPaused) return;
   if (!locked) requestLock();
-  if (e.button === 0) fireHeld = true;
+  if (e.button === 0) { fireHeld = true; fireTapT = 0.14; } // un clic rápido (entre dos fotogramas) también dispara
   if (e.button === 2) adsHeld = true;
 });
 addEventListener('mousedown', e => { if (PHOTO.on && e.target === renderer.domElement) { if (!locked) { PHOTO.drag = true; requestLock(); } else if (e.button === 0) photoShot(); } });
@@ -4970,7 +4937,7 @@ function addFeed(a, t, head, wtxt) {
 }
 function updateWeaponHUD() {
   if (!player) return;
-  $('wslots').innerHTML = MODE === 'single' ? `<div class="on"><b>★</b>${wShort(S.oneWeapon && WEAPONS[S.oneWeapon] ? S.oneWeapon : 'ak')}</div>` : MODE === 'gungame' ? GG_ORDER.map((id, i) => `<div class="${player.weapon === id ? 'on' : ''}" style="${i < player.gg ? 'opacity:.3' : ''}"><b>${i + 1}</b>${WEAPONS[id].short}</div>`).join('')
+  $('wslots').innerHTML = MODE === 'single' ? `<div class="on"><b>★</b>${wShort(S.oneWeapon && WEAPONS[S.oneWeapon] ? S.oneWeapon : 'm4')}</div>` : MODE === 'gungame' ? GG_ORDER.map((id, i) => `<div class="${player.weapon === id ? 'on' : ''}" style="${i < player.gg ? 'opacity:.3' : ''}"><b>${i + 1}</b>${WEAPONS[id].short}</div>`).join('')
     : playerOrder().map((id, i) => `<div class="${player.weapon === id ? 'on' : ''}"><b>${i + 1}</b>${wShort(id)}</div>`).join('');
   $('wname').textContent = player.weapon === 'katana' ? meleeName() : WEAPONS[player.weapon].name;
 }
@@ -4995,7 +4962,7 @@ function updateHUD(dt) {
   const kn = n => (S.keys[n] || '').replace(/^Key|^Digit/, '').replace('ShiftLeft', 'Shift').replace('Space', 'Espacio');
   if (Wp.melee) { $('ammoN').textContent = '∞'; $('ammoMax').textContent = ''; $('reload').textContent = p.katanaOut ? `KATANA LANZADA · ${kn('katana')} = teletransporte` : `Clic / ${kn('melee')} = tajo · deslízate y ataca para el tajo deslizante`; }
   else { $('ammoN').textContent = p.ammo; $('ammoMax').textContent = '/ ' + Wp.mag; $('reload').textContent = p.reloadT > 0 ? 'RECARGANDO' : p.switchT > 0 ? 'CAMBIANDO' : (p.ammo <= Math.ceil(Wp.mag * 0.2) ? `${kn('reload')} para recargar` : ''); }
-  const tpT = !TPOK ? ' · TP desactivado' : ` · TP ${p.tpLeft}/20${p.katCd > 0 ? ' · espera ' + Math.ceil(p.katCd) + ' s' : ''}`;
+  const tpT = !TPOK ? ' · TP desactivado' : ` · TP ${p.tpLeft}/5${p.katCd > 0 ? ' · espera ' + Math.ceil(p.katCd) + ' s' : ''}`;
   const eq = `<span class="${p.katanaOut ? 'hot' : ''}">${p.katanaOut ? `${meleeName()} lanzada · [${kn('katana')}] teletransporte` : `${meleeName()} [${kn('katana')}] lanzar · [${kn('melee')}] tajo`}${tpT}</span>`;
   if (eq !== HUDC.eq) { $('equip').innerHTML = eq; HUDC.eq = eq; }
   if (bannerT > 0) { bannerT -= dt; if (bannerT <= 0) $('banner').style.opacity = 0; }
@@ -5053,7 +5020,7 @@ function applyCosmetics() { // skin de armas y arma blanca de cada personaje
     e.melee = e === player ? (S.melee === 'scythe' ? 'scythe' : 'katana') : (e.idx % 3 === 1 ? 'scythe' : 'katana');
     const c = e.ch; if (!c || !c.geo) continue;
     c.wskin = e === player ? S.wskin : BOT_SKINS[(e.idx || 0) % BOT_SKINS.length];
-    c.sfPick = e === player ? (S.sfSkin || null) : (e.idx % 2 ? Object.fromEntries(Object.entries(SF_BY).map(([k, v]) => [k, v[(e.idx * 7 + k.length) % v.length]])) : null); c.meleeKind = e.melee;
+    c.meleeKind = e.melee;
     c.gun.geometry = c.geo(c.weaponId);
   }
 }
@@ -5101,7 +5068,7 @@ async function newMatch() {
 }
 async function warmUp() { // compila todos los shaders y sube todas las texturas antes de jugar (evita tirones en la primera pelea)
   try {
-    let tmpAura = null; try { tmpAura = makeAura('volt', 'dorado'); } catch (e) {}
+    let tmpAura = null; try { tmpAura = makeAura('volt', 'azul'); } catch (e) {}
     const vis = [], cul = []; scene.traverse(o => { vis.push([o, o.visible]); cul.push([o, o.frustumCulled]); o.visible = true; o.frustumCulled = false; });
     if (renderer.compileAsync) await renderer.compileAsync(scene, camera); else renderer.compile(scene, camera);
     renderer.render(scene, camera);
@@ -5300,7 +5267,7 @@ function netOnData(c, d) {
     const e = c.nid !== undefined ? entByNid(c.nid) : null;
     switch (d.t) {
       case 'join': {
-        if (NET.players.length >= 10) { netSend(c, { t: 'busy' }); break; }
+        if (NET.players.length >= 6) { netSend(c, { t: 'busy' }); break; }
         let nid = 1; while (NET.players.some(p => p.nid === nid)) nid++;
         c.nid = nid; NET.players.push({ nid, name: String(d.n || 'Jugador').slice(0, 14) });
         netSend(c, { t: 'welcome', nid, p: NET.players }); netBroadcast({ t: 'lobby', p: NET.players }, c); netUI(); netLog('Entró ' + d.n);
@@ -5455,17 +5422,17 @@ function update(dt) {
     for (const ev of m.events) {
       if (ev === 'jump') whoosh(0.08, 500, 1400, 0.12); else if (ev === 'djump' || ev === 'walljump') whoosh(0.14, 700, 2600, 0.2);
       else if (ev === 'dash') whoosh(0.2, 2400, 500, 0.2); else if (ev === 'slide') whoosh(0.12, 300, 900, 0.3);
-      else if (ev === 'bullet') whoosh(0.22, 400, 3000, 0.28); else if (ev === 'pad') beep(300, 0.25, 'sine', 0.15, 0, 900);
+      else if (ev === 'bullet') whoosh(0.12, 400, 1800, 0.18); else if (ev === 'pad') beep(300, 0.25, 'sine', 0.15, 0, 900);
       else if (ev === 'land') { beep(90, 0.08, 'sine', 0.15); shake(0.12 + m.landImpact * 0.5); }
-      if (ev === 'dash') shake(0.1); else if (ev === 'bullet') { shake(0.2); FEEL.punch += 5; } else if (ev === 'pad') shake(0.2); else if (ev === 'walljump' || ev === 'djump') shake(0.06);
-      if (ev === 'djump') addStyle(8, 'Voltereta'); else if (ev === 'walljump') addStyle(14, 'Wall jump'); else if (ev === 'vault') addStyle(12, 'Vault');
-      else if (ev === 'bullet') addStyle(12, 'Bullet jump');
+      if (ev === 'dash') shake(0.1); else if (ev === 'bullet') { shake(0.05); FEEL.punch += 1; } else if (ev === 'pad') shake(0.2); else if (ev === 'walljump' || ev === 'djump') shake(0.06);
+      if (ev === 'djump') addStyle(8, 'Doble salto'); else if (ev === 'walljump') addStyle(14, 'Wall jump'); else if (ev === 'vault') addStyle(12, 'Vault');
+      else if (ev === 'bullet') addStyle(8, 'Salto deslizado');
       if (ev === 'djump' || ev === 'dash' || ev === 'slide' || ev === 'bullet' || ev === 'wallrun' || ev === 'wallclimb') tutMark(ev); else if (ev === 'climb') addStyle(6, 'Trepar'); else if (ev === 'dash') addStyle(3);
     }
     if (m.wall) { wallAcc += dt; if (wallAcc > 0.5) { wallAcc = 0; addStyle(7); } }
   }
   act.jump = act.dash = act.slide = false;
-  tryFire(p, fireHeld && p.alive && state === 'playing' && !hsNoFire(p), dt);
+  tryFire(p, (fireHeld || fireTapT > 0) && p.alive && state === 'playing' && !hsNoFire(p), dt); fireTapT = Math.max(0, fireTapT - dt);
   kick -= kick * Math.min(1, dt * 9);
   // bots
   for (const e of ents) {
@@ -5559,7 +5526,7 @@ function syncChar(e, dt) {
   let wallLean = 0; if (m.wall) wallLean = -(m.wall.n.x * lX + m.wall.n.z * lZ) * 0.4;
   const land = m.landImpact; m.landImpact = 0;
   // personajes simplificados: solo tu personaje lleva física de pelo/ropa; los demás pierden detalles de la cara y el contorno según la distancia
-  if ('springOn' in ch) { ch.springOn = e === player; ch.setDetail && ch.setDetail(e === player ? 0 : d2 < 8 * 8 ? 1 : 3); if (ch.setFar) ch.setFar(e !== player && !PHOTO.on && state !== 'menu' && (ch.far ? d2 > 13 * 13 : d2 > 16 * 16)); }
+  if ('springOn' in ch) { ch.springOn = e === player; ch.setDetail && ch.setDetail(e === player ? 0 : d2 < 8 * 8 ? 1 : 3); if (ch.setFar) ch.setFar(e !== player && !PHOTO.on && state !== 'menu' && ((e.isBot && S.botBlocks !== false) || (ch.far ? d2 > 13 * 13 : d2 > 16 * 16))); }
   const pitch = m.pitch + (e === player ? kick : 0);
   if (!e.aimV) e.aimV = new V3();
   aimDir(m.yaw, pitch, e.aimV);
@@ -5708,28 +5675,25 @@ function bindMenu() {
   const skillName = v => v < 34 ? 'Normal' : v < 67 ? 'Medio' : 'Alto';
   const upd = () => {
     $('skill').value = S.skill; $('skillLbl').textContent = `${skillName(S.skill)} (${S.skill})`;
-    $('bots').value = S.bots; $('botsLbl').textContent = S.bots;
+    S.bots = S.allies + S.enemies;
     $('sens').value = S.sens; $('sensLbl').textContent = (+S.sens).toFixed(2);
     $('fov').value = S.fov; $('fovLbl').textContent = S.fov + '°';
     document.querySelectorAll('#gfx button').forEach(b => b.classList.toggle('on', b.dataset.v === S.gfx));
     document.querySelectorAll('#goal button').forEach(b => b.classList.toggle('on', +b.dataset.v === +S.goal));
     document.querySelectorAll('#seg6 button').forEach(b => b.classList.toggle('on', b.dataset.v === S.mode));
     $('modeDesc').textContent = MODES[S.mode] ? MODES[S.mode].desc : '';
-    const gl = { tdm: 'Meta de bajas del equipo', ffa: 'Meta de bajas', single: 'Meta de bajas', gungame: 'Duración (fija: 6 armas)', king: 'Meta de puntos', duel: 'Rondas para ganar', parkour: 'Meta (no aplica)', practice: 'Meta (no aplica)' }[S.mode];
+    const gl = { tdm: 'Meta de bajas del equipo: 30 (fija)', ffa: 'Meta de bajas: 30 (fija)', single: 'Meta de bajas: 30 (fija)', gungame: 'Duración (fija: 7 armas)', king: 'Meta de puntos: 60 (fija)', duel: 'Rondas para ganar: 5 (fija)', parkour: 'Meta (no aplica)', practice: 'Meta (no aplica)' }[S.mode];
     $('goalLbl').textContent = gl;
-    const goals = { tdm: [30, 50, 75], ffa: [15, 25, 40], single: [15, 25, 40], king: [45, 60, 90], duel: [3, 5, 7] }[S.mode];
-    document.querySelectorAll('#goal button').forEach((b, i) => { b.textContent = goals ? goals[i] : ['Corta', 'Normal', 'Larga'][i]; b.disabled = !goals; });
-    $('bots').disabled = !['ffa', 'single', 'gungame', 'king'].includes(S.mode); $('oneRow').style.display = S.mode === 'single' ? 'block' : 'none'; $('hideRow').style.display = S.mode === 'hide' ? 'block' : 'none'; $('hideSel').value = S.hideRole === 'seeker' ? 'seeker' : 'hider'; $('oneSel').value = S.oneWeapon || 'ak';
+    $('oneRow').style.display = S.mode === 'single' ? 'block' : 'none'; $('hideRow').style.display = S.mode === 'hide' ? 'block' : 'none'; $('hideSel').value = S.hideRole === 'seeker' ? 'seeker' : 'hider'; $('oneSel').value = WEAPONS[S.oneWeapon] ? S.oneWeapon : 'm4';
     try { netUI(); } catch (e) {}
     const forced = ACADEMY_ONLY.includes(S.mode);
     document.querySelectorAll('#mapSeg button').forEach(b => { b.classList.toggle('on', b.dataset.v === mapFor(S.mode)); b.disabled = forced; });
     $('mapNote').textContent = forced ? '(este modo usa su propio mapa de entrenamiento)' : '';
     document.querySelectorAll('#timeSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === TOD()));
-    document.querySelectorAll('.tdmOnly').forEach(x => x.style.opacity = ['tdm', 'squad', 'zombies', 'hide'].includes(S.mode) ? 1 : 0.4);
     $('allies').value = S.allies; $('alliesLbl').textContent = S.allies; $('enemies').value = S.enemies; $('enemiesLbl').textContent = S.enemies;
     $('res').value = S.res; $('resLbl').textContent = Math.round(S.res * 100) + '%' + (S.res < 1 ? ' (más FPS)' : '');
-    document.querySelectorAll('#mstyleSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === (S.moveStyle || 'kaze')));
-    $('mstyleDesc').textContent = (MOVE_STYLES[S.moveStyle] || MOVE_STYLES.kaze).desc;
+    document.querySelectorAll('#mstyleSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === (S.moveStyle || 'parkour')));
+    $('mstyleDesc').textContent = (MOVE_STYLES[S.moveStyle] || MOVE_STYLES.parkour).desc;
     const L = loadout(); document.querySelectorAll('#loadoutSel select').forEach(sel => sel.value = L[+sel.dataset.i]);
     $('mspd').value = S.moveSpeed; $('mspdLbl').textContent = Math.round(S.moveSpeed * 100) + '%';
     $('jmp').value = S.jumpMul; $('jmpLbl').textContent = Math.round(S.jumpMul * 100) + '%'; $('kjmp').value = S.kjumpMul; $('kjmpLbl').textContent = Math.round(S.kjumpMul * 100) + '%'; $('grv').value = S.gravMul; $('grvLbl').textContent = Math.round(S.gravMul * 100) + '%';
@@ -5740,8 +5704,8 @@ function bindMenu() {
   seg.querySelectorAll('button').forEach(b => b.onclick = () => { S.mode = b.dataset.v; saveS(); upd(); });
   document.querySelectorAll('#mapSeg button').forEach(b => b.onclick = () => { S.map = b.dataset.v; saveS(); upd(); });
   document.querySelectorAll('#timeSeg button').forEach(b => b.onclick = () => { S.tod = b.dataset.v; S.night = S.tod === 'night'; saveS(); upd(); applyLighting(); });
-  $('allies').oninput = e => { S.allies = +e.target.value; saveS(); upd(); };
-  $('enemies').oninput = e => { S.enemies = +e.target.value; saveS(); upd(); };
+  $('allies').oninput = e => { S.allies = clamp(+e.target.value, 0, 2); S.bots = S.allies + S.enemies; saveS(); upd(); };
+  $('enemies').oninput = e => { S.enemies = clamp(+e.target.value, 1, 3); S.bots = S.allies + S.enemies; saveS(); upd(); };
   $('res').oninput = e => { S.res = +e.target.value; saveS(); upd(); applyGfx(); };
   $('mstyleSeg').innerHTML = Object.entries(MOVE_STYLES).map(([k, v]) => `<button data-v="${k}">${v.name}</button>`).join('');
   $('mstyleSeg').querySelectorAll('button').forEach(b => b.onclick = () => { S.moveStyle = b.dataset.v; saveS(); upd(); if (player) player.m.P = styleParams(S.moveStyle); });
@@ -5751,29 +5715,25 @@ function bindMenu() {
     const L = loadout(), i = +sel.dataset.i, v = sel.value, j = L.indexOf(v); if (j >= 0 && j !== i) L[j] = L[i]; L[i] = v; S.loadout = L; saveS(); upd(); if (player && state !== 'menu') updateWeaponHUD();
   });
   { const st = 'background:#1c2033;color:#e8ecff;border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:6px 8px', lb = 'display:flex;gap:6px;align-items:center;font-size:13px';
-    $('cosSel').innerHTML = `<label style="${lb}">Arma blanca<select id="meleeSel" style="${st}"><option value="katana">Katana (rápida)</option><option value="scythe">Hoz (más alcance, más lenta)</option></select></label>`
+    $('cosSel').innerHTML = `<label style="${lb}">Arma blanca<select id="meleeSel" style="${st}"><option value="katana">Katana (rápida)</option><option value="scythe">Hoz (misma velocidad, más corta y menos daño)</option></select></label>`
       + `<label style="${lb}">Skin de armas<select id="wskinSel" style="${st}">${Object.keys(WSKINS).filter(k => !WSKINS[k].sf).map(k => `<option value="${k}">${WSKINS[k].name}</option>`).join('')}</select></label>`
-      + `<label style="${lb}">Aura 1.er lugar<select id="aura1Sel" style="${st}">${Object.entries(AURA_COLS).map(([k, v]) => `<option value="${k}">${v.n}</option>`).join('')}</select></label>`
-      + `<label style="${lb}">Aura 2.º lugar<select id="aura2Sel" style="${st}">${Object.entries(AURA_COLS).map(([k, v]) => `<option value="${k}">${v.n}</option>`).join('')}</select></label>`
-      + Object.entries(SF_BY).map(([c, l]) => `<label style="${lb}">Skin sci-fi · ${SF_CLS_NAME[c]}<select data-sfc="${c}" style="${st}"><option value="">Ninguna (la de arriba)</option>${l.map(n => `<option value="${n}">${n.replace('_', ' ')}</option>`).join('')}</select></label>`).join('')
-      + `<label style="${lb}">Colores de las armas sci-fi (principal · detalles)<span style="display:flex;gap:8px"><input type="color" id="sfMainC" style="height:30px;flex:1"><input type="color" id="sfAccC" style="height:30px;flex:1"></span></label>`
 ; $('appSel').innerHTML = ''
 ;
-    $('meleeSel').value = S.melee === 'scythe' ? 'scythe' : 'katana'; $('wskinSel').value = WSKINS[S.wskin] && !WSKINS[S.wskin].sf ? S.wskin : 'clasica'; document.querySelectorAll('[data-sfc]').forEach(x => { x.value = (S.sfSkin && S.sfSkin[x.dataset.sfc]) || ''; }); $('aura1Sel').value = AURA_COLS[S.aura1] ? S.aura1 : 'dorado'; $('aura2Sel').value = AURA_COLS[S.aura2] ? S.aura2 : 'morado'; $('sfMainC').value = S.sfMain || '#d9772e'; $('sfAccC').value = S.sfAcc || '#c9ccd6';
-    const ch = () => { S.melee = $('meleeSel').value; S.wskin = $('wskinSel').value; S.sfMain = $('sfMainC').value; S.sfAcc = $('sfAccC').value; S.aura1 = $('aura1Sel').value; S.aura2 = $('aura2Sel').value; S.sfSkin = {}; document.querySelectorAll('[data-sfc]').forEach(x => { if (x.value) S.sfSkin[x.dataset.sfc] = x.value; }); saveS(); upd(); if ($('meleeLbl')) $('meleeLbl').innerHTML = `<b>4</b> ${meleeName()} (siempre)`; if (typeof ents !== 'undefined' && ents.length) { applyCosmetics(); if (player && state !== 'menu') updateWeaponHUD(); } };
-    $('meleeSel').onchange = ch; $('wskinSel').onchange = ch; $('sfMainC').onchange = ch; $('sfAccC').onchange = ch; document.querySelectorAll('[data-sfc]').forEach(x => { x.onchange = ch; }); $('aura1Sel').onchange = ch; $('aura2Sel').onchange = ch; }
+    $('meleeSel').value = S.melee === 'scythe' ? 'scythe' : 'katana'; $('wskinSel').value = WSKINS[S.wskin] && !WSKINS[S.wskin].sf ? S.wskin : 'clasica';
+    const ch = () => { S.melee = $('meleeSel').value; S.wskin = $('wskinSel').value; saveS(); upd(); if ($('meleeLbl')) $('meleeLbl').innerHTML = `<b>4</b> ${meleeName()} (siempre)`; if (typeof ents !== 'undefined' && ents.length) { applyCosmetics(); if (player && state !== 'menu') updateWeaponHUD(); } };
+    $('meleeSel').onchange = ch; $('wskinSel').onchange = ch; }
   $('mspd').oninput = e => { S.moveSpeed = +e.target.value; saveS(); upd(); };
-  const refreshP = () => { if (typeof ents !== 'undefined') for (const e of ents) if (e.m) e.m.P = e === player ? styleParams(S.moveStyle) : styleParams('kaze'); };
+  const refreshP = () => { if (typeof ents !== 'undefined') for (const e of ents) if (e.m) e.m.P = styleParams('parkour'); };
   $('jmp').oninput = e => { S.jumpMul = +e.target.value; saveS(); upd(); refreshP(); };
   $('kjmp').oninput = e => { S.kjumpMul = +e.target.value; saveS(); upd(); };
   $('grv').oninput = e => { S.gravMul = +e.target.value; saveS(); upd(); refreshP(); };
   $('vol').oninput = e => { S.vol = +e.target.value; if (master) master.gain.value = 0.56 * S.vol; upd(); saveS(); };
   $('hideSel').onchange = e => { S.hideRole = e.target.value; saveS(); };
   $('slowChk').onchange = e => { S.slowmo = e.target.checked; saveS(); };
+  $('blockChk').checked = S.botBlocks !== false; $('blockChk').onchange = e => { S.botBlocks = e.target.checked; saveS(); };
   $('tpChk').checked = S.tp !== false; $('tpChk').onchange = e => { S.tp = e.target.checked; saveS(); };
   $('keyReset').onclick = () => { S.keys = { ...KEY_DEF }; saveS(); renderKeys(); };
   $('skill').oninput = e => { S.skill = +e.target.value; upd(); saveS(); };
-  $('bots').oninput = e => { S.bots = +e.target.value; upd(); saveS(); };
   $('sens').oninput = e => { S.sens = +e.target.value; upd(); saveS(); };
   $('fov').oninput = e => { S.fov = +e.target.value; upd(); saveS(); };
   document.querySelectorAll('#gfx button').forEach(b => b.onclick = () => { S.gfx = b.dataset.v; upd(); saveS(); applyGfx(); });
@@ -5853,7 +5813,7 @@ function renderKeys() {
   $('ctrlList').innerHTML = [
     `<div>${kb('fwd')}${kb('left')}${kb('back')}${kb('right')}moverse</div>`, `<div><kbd>Ratón</kbd>apuntar</div>`, `<div><kbd>Clic izq.</kbd>disparar / tajo</div>`,
     `<div><kbd>Clic der.</kbd>apuntar con mira</div>`, `<div>${kb('jump')}saltar / doble salto</div>`, `<div>${kb('dash')}dash (también en el aire)</div>`,
-    `<div>${kb('slide')}deslizar · +${keyName(K2.jump)} bullet jump</div>`, `<div><kbd>1</kbd>–<kbd>4</kbd> / <kbd>Rueda</kbd> armas · ${kb('prev')}anterior</div>`, `<div>${kb('reload')}recargar · <kbd>Tab</kbd>marcador</div>`,
+    `<div>${kb('slide')}deslizar · +${keyName(K2.jump)} salto deslizado</div>`, `<div><kbd>1</kbd>–<kbd>4</kbd> / <kbd>Rueda</kbd> armas · ${kb('prev')}anterior</div>`, `<div>${kb('reload')}recargar · <kbd>Tab</kbd>marcador</div>`,
     `<div>${kb('katana')}lanzar katana / teletransporte</div>`, `<div>${kb('melee')}tajo rápido (deslizando: tajo deslizante)</div>`].join('');
 }
 bindMenu();
@@ -5874,7 +5834,7 @@ async function init() {
     console.warn(e); loadEl.textContent = 'No se pudo cargar el personaje animado. Se usará el personaje básico.'; await sleep(1500);
   }
   loadEl.textContent = 'Preparando la academia…'; await sleep(30);
-  await natLoad(); await sfLoad(); loadMap(mapFor(S.mode)); await sleep(20);
+  await natLoad(); loadMap(mapFor(S.mode)); await sleep(20);
   try { buildNav(); } catch (e) { console.warn('nav', e); }
   state = 'loading'; await newMatch(); state = 'menu';
   refreshSkinUI();
